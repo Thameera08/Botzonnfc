@@ -21,7 +21,8 @@ cp .env.example .env
 - `JWT_SECRET`
 - `ADMIN_EMAIL`
 - `ADMIN_PASSWORD`
-- `VITE_API_BASE_URL` (default `http://localhost:5050/api`)
+- `VITE_API_BASE_URL` (local: `http://localhost:5050/api`)
+- `FRONTEND_URL` (local: `http://localhost:5173`)
 
 3. Install dependencies:
 
@@ -45,6 +46,31 @@ API: `http://localhost:5050/api`
 - `npm run dev:all` - frontend + backend
 - `npm run build` - frontend production build
 - `npm run lint` - lint all source files
+
+## Deploy To Vercel
+
+This repo is configured for Vercel with:
+
+- Static frontend build from `dist`
+- Serverless API handler at `/api/*` via `api/index.js`
+
+Files used:
+
+- `vercel.json`
+- `api/index.js`
+
+### Vercel environment variables
+
+Set these in Vercel Project Settings -> Environment Variables:
+
+- `MONGODB_URI`
+- `JWT_SECRET`
+- `ADMIN_EMAIL`
+- `ADMIN_PASSWORD`
+- `VITE_API_BASE_URL=/api`
+- `FRONTEND_URL=https://your-project-name.vercel.app`
+
+Then deploy the project. Frontend routes and API routes are served from the same domain.
 
 ## Routes
 

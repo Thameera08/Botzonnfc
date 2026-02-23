@@ -11,7 +11,6 @@ import {
   Phone,
   Share2,
   Twitter,
-  UserPlus,
 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
@@ -296,18 +295,6 @@ function PublicProfilePage() {
               </button>
             </div>
 
-            <button
-              type="button"
-              disabled={disabled}
-              onClick={() => openSafe(profile.whatsapp_url)}
-              className={`mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl py-2 text-sm font-semibold ${
-                disabled
-                  ? 'cursor-not-allowed bg-slate-200 text-slate-400'
-                  : 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white'
-              }`}
-            >
-              <UserPlus size={16} /> Add to Contact
-            </button>
             {copyMessage ? <p className="mt-1 text-center text-xs font-medium text-emerald-600">{copyMessage}</p> : null}
           </div>
         </div>

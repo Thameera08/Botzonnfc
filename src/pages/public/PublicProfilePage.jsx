@@ -123,8 +123,7 @@ function PublicProfilePage() {
   return (
     <div className="min-h-screen px-4 py-6">
       <div className="mx-auto w-full max-w-md">
-        <div className="relative h-[min(860px,calc(100vh-3rem))] overflow-hidden rounded-[2rem] border border-slate-200 bg-[#f4f7ff] shadow-[0_24px_60px_rgba(15,17,24,0.28)]">
-          <div className="h-full overflow-y-auto overscroll-contain pb-40">
+        <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-[#f4f7ff] shadow-[0_24px_60px_rgba(15,17,24,0.28)]">
           <div className="relative h-[360px] overflow-hidden">
             <img
               src={profile.profile_image_url || 'https://placehold.co/600x800'}
@@ -251,51 +250,51 @@ function PublicProfilePage() {
               })}
             </div>
 
-          </div>
-          </div>
-          <div className="absolute bottom-0 left-0 right-0 border-t border-slate-200/70 bg-white/95 p-3 backdrop-blur">
-            <div className="grid grid-cols-4 gap-2">
-              <button
-                type="button"
-                disabled={disabled}
-                onClick={() => openSafe(`tel:${profile.phone}`, true)}
-                className={`inline-flex flex-col items-center justify-center rounded-xl py-2 text-[11px] font-semibold ${
-                  disabled ? 'cursor-not-allowed text-slate-400' : 'text-slate-700 hover:bg-slate-100'
-                }`}
-              >
-                <Phone size={16} />
-                Call
-              </button>
-              <button
-                type="button"
-                disabled={disabled}
-                onClick={() => openSafe(`mailto:${profile.email}`, true)}
-                className={`inline-flex flex-col items-center justify-center rounded-xl py-2 text-[11px] font-semibold ${
-                  disabled ? 'cursor-not-allowed text-slate-400' : 'text-slate-700 hover:bg-slate-100'
-                }`}
-              >
-                <Mail size={16} />
-                Email
-              </button>
-              <button
-                type="button"
-                onClick={handleShare}
-                className="inline-flex flex-col items-center justify-center rounded-xl py-2 text-[11px] font-semibold text-slate-700 hover:bg-slate-100"
-              >
-                <Share2 size={16} />
-                Share
-              </button>
-              <button
-                type="button"
-                onClick={handleCopy}
-                className="inline-flex flex-col items-center justify-center rounded-xl py-2 text-[11px] font-semibold text-slate-700 hover:bg-slate-100"
-              >
-                <Copy size={16} />
-                Copy
-              </button>
+            <div className="mt-3 rounded-2xl bg-white p-3 shadow-sm">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Quick Actions</p>
+              <div className="grid grid-cols-4 gap-2">
+                <button
+                  type="button"
+                  disabled={disabled}
+                  onClick={() => openSafe(`tel:${profile.phone}`, true)}
+                  className={`inline-flex flex-col items-center justify-center rounded-xl py-2 text-[11px] font-semibold ${
+                    disabled ? 'cursor-not-allowed text-slate-400' : 'text-slate-700 hover:bg-slate-100'
+                  }`}
+                >
+                  <Phone size={16} />
+                  Call
+                </button>
+                <button
+                  type="button"
+                  disabled={disabled}
+                  onClick={() => openSafe(`mailto:${profile.email}`, true)}
+                  className={`inline-flex flex-col items-center justify-center rounded-xl py-2 text-[11px] font-semibold ${
+                    disabled ? 'cursor-not-allowed text-slate-400' : 'text-slate-700 hover:bg-slate-100'
+                  }`}
+                >
+                  <Mail size={16} />
+                  Email
+                </button>
+                <button
+                  type="button"
+                  onClick={handleShare}
+                  className="inline-flex flex-col items-center justify-center rounded-xl py-2 text-[11px] font-semibold text-slate-700 hover:bg-slate-100"
+                >
+                  <Share2 size={16} />
+                  Share
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCopy}
+                  className="inline-flex flex-col items-center justify-center rounded-xl py-2 text-[11px] font-semibold text-slate-700 hover:bg-slate-100"
+                >
+                  <Copy size={16} />
+                  Copy
+                </button>
+              </div>
+              {copyMessage ? <p className="mt-1 text-center text-xs font-medium text-emerald-600">{copyMessage}</p> : null}
             </div>
 
-            {copyMessage ? <p className="mt-1 text-center text-xs font-medium text-emerald-600">{copyMessage}</p> : null}
           </div>
         </div>
 

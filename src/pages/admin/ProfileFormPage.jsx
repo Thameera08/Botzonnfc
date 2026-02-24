@@ -206,12 +206,17 @@ function ProfileFormPage({ mode }) {
       {qrImage ? (
         <div className="mt-5 rounded-lg border border-slate-200 bg-slate-50 p-4">
           <p className="text-sm font-medium text-slate-800">QR Preview</p>
+          <p className="mt-1 text-xs text-slate-500">Unique QR is generated per username and saved in database.</p>
           <img src={qrImage} alt="QR code" className="mt-3 h-36 w-36 rounded bg-white p-2" />
           <Button className="mt-3" variant="secondary" onClick={() => downloadImage(qrImage, `${watch('username') || 'profile'}-qr.png`)}>
             <Download size={16} className="mr-2" /> Download QR
           </Button>
         </div>
-      ) : null}
+      ) : (
+        <div className="mt-5 rounded-lg border border-slate-200 bg-slate-50 p-4 text-xs text-slate-500">
+          QR code will be auto-generated and saved after profile creation.
+        </div>
+      )}
     </Card>
   )
 }

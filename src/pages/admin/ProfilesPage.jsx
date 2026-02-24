@@ -92,8 +92,13 @@ function ProfilesPage() {
               </Link>
               <button
                 type="button"
+                disabled={!row.qr_image_url}
                 onClick={() => downloadImage(row.qr_image_url, `${row.username}-qr.png`)}
-                className="inline-flex h-8 items-center gap-1 rounded-lg border border-slate-200 px-2 text-xs font-medium text-slate-700 transition hover:bg-slate-100"
+                className={`inline-flex h-8 items-center gap-1 rounded-lg border px-2 text-xs font-medium transition ${
+                  row.qr_image_url
+                    ? 'border-slate-200 text-slate-700 hover:bg-slate-100'
+                    : 'cursor-not-allowed border-slate-200 text-slate-400'
+                }`}
               >
                 <Download size={14} /> QR
               </button>

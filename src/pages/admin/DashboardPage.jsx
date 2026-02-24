@@ -62,7 +62,7 @@ function DashboardPage() {
                   <Icon size={16} />
                 </span>
               </div>
-              <p className="mt-2 text-3xl font-bold text-slate-900">{loading ? '...' : stats[item.key] ?? 0}</p>
+              <p className="mt-2 text-3xl font-bold text-slate-900">{loading ? <span className="inline-block h-8 w-16 animate-pulse rounded bg-slate-200" /> : stats[item.key] ?? 0}</p>
             </Card>
           )
         })}
@@ -79,7 +79,7 @@ function DashboardPage() {
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Account Split</p>
               <div className="mt-3 flex items-center gap-4">
-                <div className="relative h-24 w-24 rounded-full" style={donutStyle}>
+                <div className={`relative h-24 w-24 rounded-full ${loading ? 'animate-pulse bg-slate-200' : ''}`} style={loading ? undefined : donutStyle}>
                   <div className="absolute inset-[10px] grid place-items-center rounded-full bg-white text-xs font-semibold text-slate-700">
                     {totals.total}
                   </div>

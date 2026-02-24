@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { clearToken, getToken } from '../../utils/auth'
+import { endRequest, startRequest } from '../../utils/requestLoader'
 
 const resolveBaseUrl = () => {
   const configured = import.meta.env.VITE_API_BASE_URL
@@ -26,6 +27,7 @@ const api = axios.create({
 })
 
 api.interceptors.request.use((config) => {
+  startRequest()
   const token = getToken()
 
   if (token) {
@@ -36,8 +38,12 @@ api.interceptors.request.use((config) => {
 })
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    endRequest()
+    return response
+  },
   (error) => {
+    endRequest()
     if (error.response?.status === 401) {
       clearToken()
     }

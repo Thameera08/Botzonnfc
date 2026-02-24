@@ -173,7 +173,7 @@ function ProfilesPage() {
         </div>
       </Card>
 
-      <Table columns={columns} rows={profiles} rowKey={(row) => row.id} emptyText={loading ? 'Loading profiles...' : 'No profiles found.'} />
+      <Table columns={columns} rows={profiles} rowKey={(row) => row.id} loading={loading} emptyText="No profiles found." />
 
       <Card className="flex items-center justify-between px-4 py-3 text-sm text-slate-600">
         <p>

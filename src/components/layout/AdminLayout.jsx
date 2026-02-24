@@ -1,6 +1,8 @@
 import { LayoutDashboard, LogOut, Shield, UserCircle2 } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { clearToken } from '../../utils/auth'
+import { subscribeRequestState } from '../../utils/requestLoader'
 
 const navItems = [
   { label: 'Dashboard', to: '/admin/dashboard', icon: LayoutDashboard },
@@ -10,6 +12,12 @@ const navItems = [
 
 function AdminLayout() {
   const navigate = useNavigate()
+  const [pendingRequests, setPendingRequests] = useState(0)
+
+  useEffect(() => {
+    const unsubscribe = subscribeRequestState(setPendingRequests)
+    return unsubscribe
+  }, [])
 
   const handleLogout = () => {
     clearToken()
@@ -55,6 +63,12 @@ function AdminLayout() {
         </aside>
 
         <main className="w-full">
+          {pendingRequests > 0 ? (
+            <div className="mb-3 overflow-hidden rounded-xl border border-blue-100 bg-blue-50">
+              <div className="h-1 w-full animate-pulse bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-500" />
+              <p className="px-3 py-1 text-xs font-medium text-blue-700">Loading data...</p>
+            </div>
+          ) : null}
           <div className="modern-panel mb-4 rounded-2xl px-4 py-3">
             <h1 className="text-lg font-semibold text-slate-900">ConnetMe Admin Portal</h1>
             <p className="text-xs text-slate-500">Manage accounts, digital profiles, themes, and QR access.</p>

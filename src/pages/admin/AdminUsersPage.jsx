@@ -129,7 +129,7 @@ function AdminUsersPage() {
       </Card>
 
       <Card className="p-0">
-        <Table columns={columns} rows={users} rowKey={(row) => row.id || row._id || row.email} emptyText={loading ? 'Loading users...' : 'No admin users found.'} />
+        <Table columns={columns} rows={users} loading={loading} rowKey={(row) => row.id || row._id || row.email} emptyText="No admin users found." />
       </Card>
     </div>
   )

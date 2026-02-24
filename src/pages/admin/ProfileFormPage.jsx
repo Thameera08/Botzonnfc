@@ -62,6 +62,7 @@ function ProfileFormPage({ mode }) {
   const [qrImage, setQrImage] = useState('')
   const [imagePreview, setImagePreview] = useState('')
   const [downloadingCard, setDownloadingCard] = useState('')
+  const [cardStyle, setCardStyle] = useState('BOLD_BLUE')
   const cardFrontRef = useRef(null)
   const cardBackRef = useRef(null)
 
@@ -299,16 +300,39 @@ function ProfileFormPage({ mode }) {
           </div>
         </div>
 
+        <div className="mt-3 inline-flex rounded-xl border border-slate-200 bg-white p-1">
+          <button
+            type="button"
+            onClick={() => setCardStyle('BOLD_BLUE')}
+            className={`rounded-lg px-3 py-1.5 text-xs font-semibold ${cardStyle === 'BOLD_BLUE' ? 'bg-blue-600 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+          >
+            Bold Blue
+          </button>
+          <button
+            type="button"
+            onClick={() => setCardStyle('LIGHT_CLEAN')}
+            className={`rounded-lg px-3 py-1.5 text-xs font-semibold ${cardStyle === 'LIGHT_CLEAN' ? 'bg-blue-600 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+          >
+            Light Clean
+          </button>
+        </div>
+
         <div className="mt-4 grid gap-4 lg:grid-cols-2">
           <div className="rounded-xl border border-slate-200 bg-white p-3">
             <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Front Side</p>
             <div
               ref={cardFrontRef}
-              className="relative mx-auto h-[210px] w-[340px] overflow-hidden rounded-2xl bg-gradient-to-br from-[#0f75d9] to-[#0855a8] text-white shadow-[0_12px_30px_rgba(6,37,79,0.35)]"
+              className={`relative mx-auto h-[210px] w-[340px] overflow-hidden rounded-2xl shadow-[0_12px_30px_rgba(6,37,79,0.35)] ${
+                cardStyle === 'BOLD_BLUE'
+                  ? 'bg-gradient-to-br from-[#0f75d9] to-[#0855a8] text-white'
+                  : 'border border-slate-200 bg-gradient-to-br from-[#f5f9ff] to-[#e7f0ff] text-slate-900'
+              }`}
             >
               <div className="absolute left-4 top-4 max-w-[180px]">
                 <p className="text-[20px] font-black uppercase leading-tight">{fullName || 'FULL NAME'}</p>
-                <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-white/85">{designation || 'Designation'}</p>
+                <p className={`mt-1 text-xs font-semibold uppercase tracking-wide ${cardStyle === 'BOLD_BLUE' ? 'text-white/85' : 'text-slate-700'}`}>
+                  {designation || 'Designation'}
+                </p>
               </div>
 
               <div className="absolute bottom-4 left-4 h-[86px] w-[86px] rounded-lg bg-white p-1.5 shadow-md">
@@ -321,7 +345,7 @@ function ProfileFormPage({ mode }) {
                 )}
               </div>
 
-              <div className="absolute -right-3 top-3 text-[76px] font-black leading-[0.9] text-white/92 [writing-mode:vertical-rl]">
+              <div className={`absolute -right-3 top-3 text-[76px] font-black leading-[0.9] [writing-mode:vertical-rl] ${cardStyle === 'BOLD_BLUE' ? 'text-white/92' : 'text-blue-700/85'}`}>
                 CONNET ME
               </div>
             </div>

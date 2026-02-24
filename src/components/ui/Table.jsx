@@ -1,4 +1,4 @@
-function Table({ columns, rows, rowKey, emptyText = 'No records found.' }) {
+function Table({ columns, rows, rowKey, emptyText = 'No records found.', loading = false }) {
   return (
     <div className="modern-panel overflow-hidden rounded-2xl">
       <div className="overflow-x-auto">
@@ -13,7 +13,17 @@ function Table({ columns, rows, rowKey, emptyText = 'No records found.' }) {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {!rows.length ? (
+            {loading ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <tr key={`loading-${i}`}>
+                  {columns.map((column) => (
+                    <td key={`${column.key}-${i}`} className="px-4 py-3">
+                      <div className="h-4 w-full animate-pulse rounded bg-slate-200" />
+                    </td>
+                  ))}
+                </tr>
+              ))
+            ) : !rows.length ? (
               <tr>
                 <td colSpan={columns.length} className="px-4 py-8 text-center text-sm text-slate-500">
                   {emptyText}

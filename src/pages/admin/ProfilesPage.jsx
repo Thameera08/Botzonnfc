@@ -9,10 +9,12 @@ import Table from '../../components/ui/Table'
 import Toggle from '../../components/ui/Toggle'
 import { getProfiles, updateProfileStatus } from '../../services/api/profileApi'
 import { downloadImage } from '../../utils/download'
+import { getAuthUser } from '../../utils/auth'
 
 const PAGE_LIMIT = 10
 
 function ProfilesPage() {
+  const authUser = getAuthUser()
   const [profiles, setProfiles] = useState([])
   const [meta, setMeta] = useState({ page: 1, totalPages: 1, total: 0 })
   const [loading, setLoading] = useState(true)
@@ -166,11 +168,13 @@ function ProfilesPage() {
           </select>
           <Button type="submit">Apply</Button>
         </form>
-        <div className="mt-3">
-          <Link to="/admin/profiles/new">
-            <Button>Create Profile</Button>
-          </Link>
-        </div>
+        {authUser?.role === 'SUPER_ADMIN' ? (
+          <div className="mt-3">
+            <Link to="/admin/profiles/new">
+              <Button>Create Profile</Button>
+            </Link>
+          </div>
+        ) : null}
       </Card>
 
       <Table columns={columns} rows={profiles} rowKey={(row) => row.id} loading={loading} emptyText="No profiles found." />

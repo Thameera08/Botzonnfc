@@ -2,26 +2,44 @@ import { LayoutDashboard, LogOut, Shield, UserCircle2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import BrandLogo2 from '../common/BrandLogo2'
-import { clearToken } from '../../utils/auth'
+import { clearAuth, getAuthUser, setAuthUser } from '../../utils/auth'
 import { subscribeRequestState } from '../../utils/requestLoader'
-
-const navItems = [
-  { label: 'Dashboard', to: '/admin/dashboard', icon: LayoutDashboard },
-  { label: 'Admin Users', to: '/admin/users', icon: Shield },
-  { label: 'Profiles', to: '/admin/profiles', icon: UserCircle2 },
-]
+import { getMe } from '../../services/api/authApi'
 
 function AdminLayout() {
   const navigate = useNavigate()
   const [pendingRequests, setPendingRequests] = useState(0)
+  const [authUser, setLocalAuthUser] = useState(() => getAuthUser())
+
+  const navItems = [
+    { label: 'Dashboard', to: '/admin/dashboard', icon: LayoutDashboard, show: true },
+    { label: 'My Account', to: '/admin/my-account', icon: UserCircle2, show: true },
+    { label: 'Admin Users', to: '/admin/users', icon: Shield, show: authUser?.role === 'SUPER_ADMIN' },
+    { label: 'Profiles', to: '/admin/profiles', icon: UserCircle2, show: true },
+  ].filter((item) => item.show)
 
   useEffect(() => {
     const unsubscribe = subscribeRequestState(setPendingRequests)
     return unsubscribe
   }, [])
 
+  useEffect(() => {
+    const loadMe = async () => {
+      if (authUser?.role) return
+      try {
+        const me = await getMe()
+        setAuthUser(me)
+        setLocalAuthUser(me)
+      } catch {
+        // auth interceptor handles invalid token
+      }
+    }
+
+    loadMe()
+  }, [authUser])
+
   const handleLogout = () => {
-    clearToken()
+    clearAuth()
     navigate('/admin/login', { replace: true })
   }
 
@@ -33,7 +51,7 @@ function AdminLayout() {
             to="/admin/dashboard"
             className="mb-4 flex items-center justify-center rounded-xl bg-white px-3 py-3 shadow-[0_10px_20px_rgba(15,111,255,0.14)]"
           >
-            <BrandLogo2 imageClassName="h-40 w-20 max-w-none" />
+            <BrandLogo2 imageClassName="h-12 w-auto max-w-none" />
           </Link>
           <nav className="space-y-1 ">
             {navItems.map((item) => {

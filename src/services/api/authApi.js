@@ -5,6 +5,31 @@ export const login = async (payload) => {
   return response.data
 }
 
+export const getMe = async () => {
+  const response = await api.get('/admin/me')
+  return response.data
+}
+
+export const updateMe = async (payload) => {
+  const response = await api.put('/admin/me', payload)
+  return response.data
+}
+
+export const updateMyPassword = async (payload) => {
+  const response = await api.patch('/admin/me/password', payload)
+  return response.data
+}
+
+export const getMyProfile = async () => {
+  const response = await api.get('/admin/me/profile')
+  return response.data
+}
+
+export const updateMyProfile = async (payload) => {
+  const response = await api.put('/admin/me/profile', payload)
+  return response.data
+}
+
 export const getAdminUsers = async () => {
   const response = await api.get('/admin/users')
   return response.data

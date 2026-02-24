@@ -8,7 +8,7 @@ import Card from '../../components/ui/Card'
 import BrandLogo2 from '../../components/common/BrandLogo2'
 import Input from '../../components/ui/Input'
 import { login } from '../../services/api/authApi'
-import { isAuthenticated, setToken } from '../../utils/auth'
+import { isAuthenticated, setAuthUser, setToken } from '../../utils/auth'
 
 const schema = z.object({
   email: z.string().email('Enter a valid email address'),
@@ -43,6 +43,9 @@ function LoginPage() {
       }
 
       setToken(token)
+      if (data?.admin) {
+        setAuthUser(data.admin)
+      }
       navigate(from, { replace: true })
     } catch (error) {
       setApiError(error.response?.data?.message || 'Invalid credentials. Please try again.')

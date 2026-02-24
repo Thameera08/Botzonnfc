@@ -11,6 +11,7 @@ import Input from '../../components/ui/Input'
 import Toggle from '../../components/ui/Toggle'
 import { createProfile, getProfileById, updateProfile } from '../../services/api/profileApi'
 import { downloadImage } from '../../utils/download'
+import { getAuthUser } from '../../utils/auth'
 
 const profileSchema = z.object({
   full_name: z.string().min(1, 'Full name is required'),
@@ -33,6 +34,11 @@ const profileSchema = z.object({
   nfc_uid: z.string().optional(),
   public_theme: z.enum(['DARK_MINIMAL', 'LIGHT_GLASS', 'CLASSIC_BLUE']),
   status: z.enum(['ACTIVE', 'DISABLED']),
+  create_admin_account: z.boolean().optional(),
+  admin_full_name: z.string().optional(),
+  admin_email: z.string().email('Enter a valid admin email').or(z.literal('')).optional(),
+  admin_password: z.string().optional(),
+  admin_profile_image_url: z.string().optional(),
 })
 
 const initialValues = {
@@ -53,9 +59,16 @@ const initialValues = {
   nfc_uid: '',
   public_theme: 'DARK_MINIMAL',
   status: 'ACTIVE',
+  create_admin_account: false,
+  admin_full_name: '',
+  admin_email: '',
+  admin_password: '',
+  admin_profile_image_url: '',
 }
 
 function ProfileFormPage({ mode }) {
+  const authUser = getAuthUser()
+  const isSuperAdmin = authUser?.role === 'SUPER_ADMIN'
   const { id } = useParams()
   const navigate = useNavigate()
   const [loadingProfile, setLoadingProfile] = useState(mode === 'edit')
@@ -70,6 +83,8 @@ function ProfileFormPage({ mode }) {
     register,
     handleSubmit,
     setValue,
+    setError,
+    clearErrors,
     reset,
     watch,
     formState: { errors, isSubmitting },
@@ -79,6 +94,7 @@ function ProfileFormPage({ mode }) {
   })
 
   const status = watch('status')
+  const createAdminAccount = watch('create_admin_account')
   const selectedTheme = watch('public_theme')
   const fullName = watch('full_name')
   const designation = watch('designation')
@@ -145,6 +161,22 @@ function ProfileFormPage({ mode }) {
   }
 
   const onSubmit = async (values) => {
+    if (mode === 'create' && values.create_admin_account) {
+      clearErrors(['admin_full_name', 'admin_email', 'admin_password'])
+      if (!values.admin_full_name?.trim()) {
+        setError('admin_full_name', { message: 'Admin full name is required' })
+        return
+      }
+      if (!values.admin_email?.trim()) {
+        setError('admin_email', { message: 'Admin email is required' })
+        return
+      }
+      if ((values.admin_password || '').length < 6) {
+        setError('admin_password', { message: 'Temporary password must be at least 6 characters' })
+        return
+      }
+    }
+
     if (mode === 'edit') {
       await updateProfile(id, values)
     } else {
@@ -156,6 +188,15 @@ function ProfileFormPage({ mode }) {
 
   if (loadingProfile) {
     return <Card className="p-6 text-sm text-slate-600">Loading profile...</Card>
+  }
+
+  if (mode === 'create' && !isSuperAdmin) {
+    return (
+      <Card className="p-6">
+        <h2 className="text-lg font-semibold text-slate-900">Create Profile</h2>
+        <p className="mt-2 text-sm text-amber-700">Only super admin can create new profiles.</p>
+      </Card>
+    )
   }
 
   return (
@@ -179,7 +220,7 @@ function ProfileFormPage({ mode }) {
         <Input label="Full Name *" error={errors.full_name?.message} {...register('full_name')} />
         <Input label="Company Name" error={errors.company_name?.message} {...register('company_name')} />
         <Input label="Designation" error={errors.designation?.message} {...register('designation')} />
-        <Input label="Username *" error={errors.username?.message} {...register('username')} />
+        <Input label="Username *" error={errors.username?.message} disabled={mode === 'edit' && !isSuperAdmin} {...register('username')} />
         <Input label="Email *" type="email" error={errors.email?.message} {...register('email')} />
         <Input label="Phone *" error={errors.phone?.message} {...register('phone')} />
         <Input label="Location" error={errors.location?.message} {...register('location')} />
@@ -223,14 +264,47 @@ function ProfileFormPage({ mode }) {
           ) : null}
         </div>
 
-        <div className="md:col-span-2 flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 p-4">
-          <Toggle
-            checked={status === 'ACTIVE'}
-            onChange={(checked) => setValue('status', checked ? 'ACTIVE' : 'DISABLED')}
-            label="Profile status"
-          />
-          <span className="text-sm text-slate-700">Status: {status}</span>
-        </div>
+        {isSuperAdmin ? (
+          <div className="md:col-span-2 flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 p-4">
+            <Toggle
+              checked={status === 'ACTIVE'}
+              onChange={(checked) => setValue('status', checked ? 'ACTIVE' : 'DISABLED')}
+              label="Profile status"
+            />
+            <span className="text-sm text-slate-700">Status: {status}</span>
+          </div>
+        ) : null}
+
+        {mode === 'create' && isSuperAdmin ? (
+          <div className="md:col-span-2 rounded-lg border border-slate-200 bg-slate-50 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-sm font-medium text-slate-800">Create Login Account For This User</p>
+                <p className="text-xs text-slate-500">If enabled, this user can log in and edit only their own account/profile.</p>
+              </div>
+              <Toggle checked={Boolean(createAdminAccount)} onChange={(checked) => setValue('create_admin_account', checked)} />
+            </div>
+
+            {createAdminAccount ? (
+              <div className="mt-3 grid gap-3 md:grid-cols-2">
+                <Input label="Admin Full Name *" error={errors.admin_full_name?.message} {...register('admin_full_name')} />
+                <Input label="Admin Email *" type="email" error={errors.admin_email?.message} {...register('admin_email')} />
+                <Input
+                  label="Temporary Password *"
+                  type="password"
+                  error={errors.admin_password?.message}
+                  placeholder="Minimum 6 characters"
+                  {...register('admin_password')}
+                />
+                <Input
+                  label="Admin Profile Image URL"
+                  error={errors.admin_profile_image_url?.message}
+                  {...register('admin_profile_image_url')}
+                />
+              </div>
+            ) : null}
+          </div>
+        ) : null}
 
         <div className="md:col-span-2 rounded-lg border border-slate-200 bg-slate-50 p-4">
           <p className="text-sm font-medium text-slate-800">Public Profile Theme</p>

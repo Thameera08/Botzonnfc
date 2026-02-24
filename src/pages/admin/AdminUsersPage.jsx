@@ -9,6 +9,7 @@ import Input from '../../components/ui/Input'
 import Table from '../../components/ui/Table'
 import Toggle from '../../components/ui/Toggle'
 import { createAdminUser, getAdminUsers, resetAdminUserPassword, updateAdminUser, updateAdminUserStatus } from '../../services/api/authApi'
+import { getAuthUser } from '../../utils/auth'
 
 const schema = z.object({
   full_name: z.string().min(2, 'Name is required'),
@@ -16,9 +17,11 @@ const schema = z.object({
   password: z.string().optional(),
   profile_image_url: z.string().optional(),
   status: z.enum(['ACTIVE', 'DISABLED']),
+  role: z.enum(['ADMIN', 'SUPER_ADMIN']),
 })
 
 function AdminUsersPage() {
+  const authUser = getAuthUser()
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
   const [apiError, setApiError] = useState('')
@@ -43,6 +46,7 @@ function AdminUsersPage() {
       password: '',
       profile_image_url: '',
       status: 'ACTIVE',
+      role: 'ADMIN',
     },
   })
   const profileImage = watch('profile_image_url')
@@ -76,12 +80,13 @@ function AdminUsersPage() {
           email: values.email,
           profile_image_url: values.profile_image_url,
           status: values.status,
+          role: values.role,
         })
       } else {
         await createAdminUser(values)
       }
 
-      reset({ full_name: '', email: '', password: '', profile_image_url: '', status: 'ACTIVE' })
+      reset({ full_name: '', email: '', password: '', profile_image_url: '', status: 'ACTIVE', role: 'ADMIN' })
       setEditingUser(null)
       await loadUsers()
     } catch (error) {
@@ -154,6 +159,13 @@ function AdminUsersPage() {
       ),
     },
     {
+      key: 'role',
+      title: 'Role',
+      render: (row) => (
+        <span className="inline-flex rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700">{row.role || 'ADMIN'}</span>
+      ),
+    },
+    {
       key: 'created_at',
       title: 'Created',
       render: (row) => (row.created_at ? new Date(row.created_at).toLocaleDateString() : '-'),
@@ -176,6 +188,7 @@ function AdminUsersPage() {
                 password: '',
                 profile_image_url: row.profile_image_url || '',
                 status: row.status || 'ACTIVE',
+                role: row.role || 'ADMIN',
               })
             }}
           >
@@ -188,6 +201,15 @@ function AdminUsersPage() {
       ),
     },
   ]
+
+  if (authUser?.role !== 'SUPER_ADMIN') {
+    return (
+      <Card className="p-5">
+        <h2 className="text-lg font-semibold text-slate-900">Admin Users</h2>
+        <p className="mt-2 text-sm text-amber-700">Only super admin can manage admin accounts.</p>
+      </Card>
+    )
+  }
 
   return (
     <div className="space-y-4">
@@ -218,6 +240,16 @@ function AdminUsersPage() {
               <option value="DISABLED">Disabled</option>
             </select>
           </label>
+          <label className="flex w-full flex-col gap-1.5">
+            <span className="text-sm font-medium text-slate-700">Role</span>
+            <select
+              {...register('role')}
+              className="h-11 rounded-xl border border-slate-200 bg-white/95 px-3 text-sm outline-none ring-blue-200 transition focus:border-blue-500 focus:ring-2"
+            >
+              <option value="ADMIN">Admin</option>
+              <option value="SUPER_ADMIN">Super Admin</option>
+            </select>
+          </label>
 
           <div className="md:col-span-5 rounded-xl border border-slate-200 bg-slate-50 p-3">
             <p className="text-sm font-medium text-slate-700">Profile Image</p>
@@ -244,7 +276,7 @@ function AdminUsersPage() {
                 onClick={() => {
                   setEditingUser(null)
                   setApiError('')
-                  reset({ full_name: '', email: '', password: '', profile_image_url: '', status: 'ACTIVE' })
+                  reset({ full_name: '', email: '', password: '', profile_image_url: '', status: 'ACTIVE', role: 'ADMIN' })
                 }}
               >
                 Cancel Edit

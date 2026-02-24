@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { clearToken, getToken } from '../../utils/auth'
+import { clearAuth, getToken } from '../../utils/auth'
 import { endRequest, startRequest } from '../../utils/requestLoader'
 
 const resolveBaseUrl = () => {
@@ -45,7 +45,7 @@ api.interceptors.response.use(
   (error) => {
     endRequest()
     if (error.response?.status === 401) {
-      clearToken()
+      clearAuth()
     }
 
     return Promise.reject(error)

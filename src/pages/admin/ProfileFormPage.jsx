@@ -30,6 +30,7 @@ const profileSchema = z.object({
   twitter_url: z.string().url('Enter a valid URL').or(z.literal('')),
   whatsapp_url: z.string().url('Enter a valid URL').or(z.literal('')),
   nfc_uid: z.string().optional(),
+  public_theme: z.enum(['DARK_MINIMAL', 'LIGHT_GLASS', 'CLASSIC_BLUE']),
   status: z.enum(['ACTIVE', 'DISABLED']),
 })
 
@@ -49,6 +50,7 @@ const initialValues = {
   twitter_url: '',
   whatsapp_url: '',
   nfc_uid: '',
+  public_theme: 'DARK_MINIMAL',
   status: 'ACTIVE',
 }
 
@@ -72,6 +74,7 @@ function ProfileFormPage({ mode }) {
   })
 
   const status = watch('status')
+  const selectedTheme = watch('public_theme')
 
   const fileToDataUrl = (file) =>
     new Promise((resolve, reject) => {
@@ -100,6 +103,7 @@ function ProfileFormPage({ mode }) {
           instagram_url: profile.instagram_url || '',
           twitter_url: profile.twitter_url || '',
           whatsapp_url: profile.whatsapp_url || '',
+          public_theme: profile.public_theme || 'DARK_MINIMAL',
         })
 
         setQrImage(profile.qr_image_url || '')
@@ -200,6 +204,47 @@ function ProfileFormPage({ mode }) {
             label="Profile status"
           />
           <span className="text-sm text-slate-700">Status: {status}</span>
+        </div>
+
+        <div className="md:col-span-2 rounded-lg border border-slate-200 bg-slate-50 p-4">
+          <p className="text-sm font-medium text-slate-800">Public Profile Theme</p>
+          <p className="mt-1 text-xs text-slate-500">Select which public profile style this user should see.</p>
+
+          <select
+            {...register('public_theme')}
+            className="mt-3 h-11 w-full rounded-xl border border-slate-200 bg-white/95 px-3 text-sm outline-none ring-blue-200 transition focus:border-blue-500 focus:ring-2"
+          >
+            <option value="DARK_MINIMAL">Dark Minimal</option>
+            <option value="LIGHT_GLASS">Light Glass</option>
+            <option value="CLASSIC_BLUE">Classic Blue</option>
+          </select>
+
+          <div className="mt-3 grid gap-2 md:grid-cols-3">
+            <button
+              type="button"
+              onClick={() => setValue('public_theme', 'DARK_MINIMAL', { shouldDirty: true })}
+              className={`rounded-xl border p-3 text-left transition ${selectedTheme === 'DARK_MINIMAL' ? 'border-slate-900 ring-2 ring-slate-300' : 'border-slate-200'}`}
+            >
+              <div className="h-16 rounded-lg bg-gradient-to-b from-slate-800 to-slate-950" />
+              <p className="mt-2 text-xs font-semibold text-slate-700">Dark Minimal</p>
+            </button>
+            <button
+              type="button"
+              onClick={() => setValue('public_theme', 'LIGHT_GLASS', { shouldDirty: true })}
+              className={`rounded-xl border p-3 text-left transition ${selectedTheme === 'LIGHT_GLASS' ? 'border-blue-600 ring-2 ring-blue-200' : 'border-slate-200'}`}
+            >
+              <div className="h-16 rounded-lg bg-gradient-to-r from-slate-100 to-cyan-100" />
+              <p className="mt-2 text-xs font-semibold text-slate-700">Light Glass</p>
+            </button>
+            <button
+              type="button"
+              onClick={() => setValue('public_theme', 'CLASSIC_BLUE', { shouldDirty: true })}
+              className={`rounded-xl border p-3 text-left transition ${selectedTheme === 'CLASSIC_BLUE' ? 'border-blue-600 ring-2 ring-blue-200' : 'border-slate-200'}`}
+            >
+              <div className="h-16 rounded-lg bg-gradient-to-r from-blue-600 to-sky-500" />
+              <p className="mt-2 text-xs font-semibold text-slate-700">Classic Blue</p>
+            </button>
+          </div>
         </div>
       </form>
 

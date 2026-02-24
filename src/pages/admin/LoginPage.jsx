@@ -55,8 +55,8 @@ function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-10">
       <Card className="w-full max-w-md p-6">
-        <h1 className="text-2xl font-bold text-slate-900">Admin Login</h1>
-        <p className="mt-1 text-sm text-slate-600">Sign in to manage business profiles.</p>
+        <h1 className="text-2xl font-bold text-slate-900">ConnetMe Admin Login</h1>
+        <p className="mt-1 text-sm text-slate-600">Sign in to manage business profiles and user access.</p>
 
         <form className="mt-6 space-y-4" onSubmit={handleSubmit(onSubmit)}>
           <Input label="Email" type="email" placeholder="admin@domain.com" error={errors.email?.message} {...register('email')} />

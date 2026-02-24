@@ -3,6 +3,7 @@ import PrivateRoute from './components/common/PrivateRoute'
 import AdminLayout from './components/layout/AdminLayout'
 import DashboardPage from './pages/admin/DashboardPage'
 import LoginPage from './pages/admin/LoginPage'
+import AdminUsersPage from './pages/admin/AdminUsersPage'
 import ProfileFormPage from './pages/admin/ProfileFormPage'
 import ProfilesPage from './pages/admin/ProfilesPage'
 import PublicProfilePage from './pages/public/PublicProfilePage'
@@ -21,6 +22,7 @@ function App() {
       >
         <Route index element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="dashboard" element={<DashboardPage />} />
+        <Route path="users" element={<AdminUsersPage />} />
         <Route path="profiles" element={<ProfilesPage />} />
         <Route path="profiles/new" element={<ProfileFormPage mode="create" />} />
         <Route path="profiles/:id/edit" element={<ProfileFormPage mode="edit" />} />

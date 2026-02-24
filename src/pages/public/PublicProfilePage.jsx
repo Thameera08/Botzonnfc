@@ -40,6 +40,9 @@ function PublicProfilePage() {
   }, [username])
 
   const disabled = profile?.status === 'DISABLED'
+  const theme = profile?.public_theme || 'DARK_MINIMAL'
+  const isDarkTheme = theme === 'DARK_MINIMAL'
+  const isLightGlassTheme = theme === 'LIGHT_GLASS'
   const profileLink = typeof window !== 'undefined' ? window.location.href : ''
 
   const socialLinks = useMemo(
@@ -125,17 +128,48 @@ function PublicProfilePage() {
     )
   }
 
+  const pageThemeClass = isDarkTheme
+    ? 'min-h-screen bg-[radial-gradient(circle_at_top,rgba(37,99,235,0.25),transparent_40%),#090d17] px-4 py-8 text-slate-100'
+    : isLightGlassTheme
+      ? 'min-h-screen bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.2),transparent_40%),#eef5ff] px-4 py-8 text-slate-900'
+      : 'min-h-screen bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.3),transparent_40%),#eaf2ff] px-4 py-8 text-slate-900'
+
+  const shellClass = isDarkTheme
+    ? 'overflow-hidden rounded-[28px] border border-white/10 bg-[#0d1424] shadow-[0_24px_70px_rgba(0,0,0,0.45)]'
+    : 'overflow-hidden rounded-[28px] border border-slate-200 bg-white/80 shadow-[0_24px_70px_rgba(15,23,42,0.18)] backdrop-blur'
+
+  const heroOverlayClass = isDarkTheme
+    ? 'absolute inset-0 bg-gradient-to-t from-[#0d1424] via-[#0d1424]/55 to-transparent'
+    : 'absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-900/20 to-transparent'
+
+  const contentClass = isDarkTheme ? 'space-y-3 bg-[#0d1424] p-4' : 'space-y-3 bg-transparent p-4'
+  const aboutClass = isDarkTheme
+    ? 'rounded-2xl border border-slate-700/60 bg-[#121b2f] p-4'
+    : 'rounded-2xl border border-slate-200 bg-white/90 p-4'
+  const tileClass = isDarkTheme
+    ? 'border-slate-700 bg-slate-800/40 text-slate-100 hover:bg-slate-700/60'
+    : 'border-slate-200 bg-white/90 text-slate-800 hover:bg-slate-100'
+  const tileDisabledClass = isDarkTheme
+    ? 'cursor-not-allowed border-slate-700 bg-slate-800/40 text-slate-500'
+    : 'cursor-not-allowed border-slate-200 bg-white/60 text-slate-400'
+  const actionClass = isDarkTheme
+    ? 'border-slate-600 bg-slate-800/50 text-slate-100 hover:bg-slate-700/70'
+    : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-100'
+  const actionDisabledClass = isDarkTheme
+    ? 'cursor-not-allowed border-slate-700 bg-slate-800/40 text-slate-500'
+    : 'cursor-not-allowed border-slate-200 bg-white/60 text-slate-400'
+
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(37,99,235,0.25),transparent_40%),#090d17] px-4 py-8 text-slate-100">
+    <div className={pageThemeClass}>
       <div className="mx-auto w-full max-w-md">
-        <div className="overflow-hidden rounded-[28px] border border-white/10 bg-[#0d1424] shadow-[0_24px_70px_rgba(0,0,0,0.45)]">
+        <div className={shellClass}>
           <div className="relative h-72 overflow-hidden">
             <img
               src={profile.profile_image_url || 'https://placehold.co/600x800'}
               alt={profile.full_name}
               className="h-full w-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0d1424] via-[#0d1424]/55 to-transparent" />
+            <div className={heroOverlayClass} />
             <div className="absolute inset-x-0 bottom-0 p-5">
               <h1 className="text-4xl font-bold uppercase tracking-tight text-white">{profile.full_name}</h1>
               <p className="mt-1 text-sm text-slate-200">{profile.designation || 'Professional'}</p>
@@ -143,7 +177,7 @@ function PublicProfilePage() {
             </div>
           </div>
 
-          <div className="space-y-3 bg-[#0d1424] p-4">
+          <div className={contentClass}>
             {disabled ? (
               <div className="rounded-xl border border-amber-700/40 bg-amber-900/20 px-3 py-2 text-xs text-amber-200">
                 This business profile is currently unavailable.
@@ -174,9 +208,11 @@ function PublicProfilePage() {
               })}
             </div>
 
-            <div className="rounded-2xl border border-slate-700/60 bg-[#121b2f] p-4">
-              <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">About</p>
-              <p className="mt-2 text-sm leading-relaxed text-slate-200">{profile.bio || 'Welcome to my digital business profile.'}</p>
+            <div className={aboutClass}>
+              <p className={`text-xs font-semibold uppercase tracking-widest ${isDarkTheme ? 'text-slate-400' : 'text-slate-500'}`}>About</p>
+              <p className={`mt-2 text-sm leading-relaxed ${isDarkTheme ? 'text-slate-200' : 'text-slate-700'}`}>
+                {profile.bio || 'Welcome to my digital business profile.'}
+              </p>
             </div>
 
             <div className="grid grid-cols-2 gap-2">
@@ -185,9 +221,7 @@ function PublicProfilePage() {
                 disabled={disabled}
                 onClick={() => openSafe(`tel:${profile.phone}`, true)}
                 className={`rounded-xl border px-3 py-2 text-sm font-medium transition ${
-                  disabled
-                    ? 'cursor-not-allowed border-slate-700 bg-slate-800/40 text-slate-500'
-                    : 'border-slate-600 bg-slate-800/50 text-slate-100 hover:bg-slate-700/70'
+                  disabled ? actionDisabledClass : actionClass
                 }`}
               >
                 <span className="inline-flex items-center gap-2">
@@ -199,9 +233,7 @@ function PublicProfilePage() {
                 disabled={disabled}
                 onClick={() => openSafe(`mailto:${profile.email}`, true)}
                 className={`rounded-xl border px-3 py-2 text-sm font-medium transition ${
-                  disabled
-                    ? 'cursor-not-allowed border-slate-700 bg-slate-800/40 text-slate-500'
-                    : 'border-slate-600 bg-slate-800/50 text-slate-100 hover:bg-slate-700/70'
+                  disabled ? actionDisabledClass : actionClass
                 }`}
               >
                 <span className="inline-flex items-center gap-2">
@@ -211,7 +243,7 @@ function PublicProfilePage() {
               <button
                 type="button"
                 onClick={handleShare}
-                className="rounded-xl border border-slate-600 bg-slate-800/50 px-3 py-2 text-sm font-medium text-slate-100 transition hover:bg-slate-700/70"
+                className={`rounded-xl border px-3 py-2 text-sm font-medium transition ${actionClass}`}
               >
                 <span className="inline-flex items-center gap-2">
                   <Share2 size={14} /> Share
@@ -220,7 +252,7 @@ function PublicProfilePage() {
               <button
                 type="button"
                 onClick={handleCopy}
-                className="rounded-xl border border-slate-600 bg-slate-800/50 px-3 py-2 text-sm font-medium text-slate-100 transition hover:bg-slate-700/70"
+                className={`rounded-xl border px-3 py-2 text-sm font-medium transition ${actionClass}`}
               >
                 <span className="inline-flex items-center gap-2">
                   <Copy size={14} /> Copy
@@ -237,8 +269,8 @@ function PublicProfilePage() {
                 onClick={() => openSafe(`mailto:${profile.email}`, true)}
                 className={`flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left ${
                   disabled
-                    ? 'cursor-not-allowed border-slate-700 bg-slate-800/40 text-slate-500'
-                    : 'border-slate-700 bg-slate-800/40 text-slate-100 hover:bg-slate-700/60'
+                    ? tileDisabledClass
+                    : tileClass
                 }`}
               >
                 <span className="inline-flex items-center gap-2 text-sm">
@@ -253,8 +285,8 @@ function PublicProfilePage() {
                 onClick={() => openSafe(`tel:${profile.phone}`, true)}
                 className={`flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left ${
                   disabled
-                    ? 'cursor-not-allowed border-slate-700 bg-slate-800/40 text-slate-500'
-                    : 'border-slate-700 bg-slate-800/40 text-slate-100 hover:bg-slate-700/60'
+                    ? tileDisabledClass
+                    : tileClass
                 }`}
               >
                 <span className="inline-flex items-center gap-2 text-sm">
@@ -269,8 +301,8 @@ function PublicProfilePage() {
                 onClick={() => openSafe(`https://maps.google.com/?q=${encodeURIComponent(profile.location || '')}`)}
                 className={`flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left ${
                   disabled || !profile.location
-                    ? 'cursor-not-allowed border-slate-700 bg-slate-800/40 text-slate-500'
-                    : 'border-slate-700 bg-slate-800/40 text-slate-100 hover:bg-slate-700/60'
+                    ? tileDisabledClass
+                    : tileClass
                 }`}
               >
                 <span className="inline-flex items-center gap-2 text-sm">
@@ -293,14 +325,14 @@ function PublicProfilePage() {
                     onClick={() => openSafe(item.href)}
                     className={`flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left transition ${
                       blocked
-                        ? 'cursor-not-allowed border-slate-700 bg-slate-800/40 text-slate-500'
-                        : 'border-slate-700 bg-slate-800/40 text-slate-100 hover:bg-slate-700/60'
+                        ? tileDisabledClass
+                        : tileClass
                     }`}
                   >
                     <span className="inline-flex items-center gap-2">
-                      <span className="grid h-8 w-8 place-items-center rounded-lg bg-blue-500/20 text-blue-300">
-                        <Icon size={15} />
-                      </span>
+                        <span className={`grid h-8 w-8 place-items-center rounded-lg ${isDarkTheme ? 'bg-blue-500/20 text-blue-300' : 'bg-blue-100 text-blue-600'}`}>
+                          <Icon size={15} />
+                        </span>
                       <span>
                         <p className="text-sm font-medium">{item.label}</p>
                         <p className="text-xs text-slate-400">{item.subtitle}</p>

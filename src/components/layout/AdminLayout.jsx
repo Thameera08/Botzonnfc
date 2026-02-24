@@ -13,9 +13,9 @@ function AdminLayout() {
 
   const navItems = [
     { label: 'Dashboard', to: '/admin/dashboard', icon: LayoutDashboard, show: authUser?.role === 'SUPER_ADMIN' },
-    { label: 'My Profile', to: '/admin/my-account', icon: UserCircle2, show: true },
+    { label: 'My Account', to: '/admin/my-account', icon: UserCircle2, show: true },
     { label: 'Admin Users', to: '/admin/users', icon: Shield, show: authUser?.role === 'SUPER_ADMIN' },
-    { label: 'Profiles', to: '/admin/profiles', icon: UserCircle2, show: true },
+    { label: 'Public Profiles', to: '/admin/profiles', icon: UserCircle2, show: true },
   ].filter((item) => item.show)
 
   useEffect(() => {

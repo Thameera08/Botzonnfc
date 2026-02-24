@@ -110,9 +110,9 @@ function PublicProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(37,99,235,0.25),transparent_40%),#090d17] px-4 py-8 text-slate-200">
-        <div className="mx-auto w-full max-w-md">
-          <div className="overflow-hidden rounded-[28px] border border-white/10 bg-[#0d1424] shadow-[0_24px_70px_rgba(0,0,0,0.45)]">
+      <div className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(37,99,235,0.25),transparent_40%),#090d17] text-slate-200">
+        <div className="w-full">
+          <div className="min-h-screen overflow-hidden border border-white/10 bg-[#0d1424] shadow-[0_24px_70px_rgba(0,0,0,0.45)] md:mx-auto md:min-h-[100dvh] md:max-w-md md:rounded-[28px]">
             <div className="relative h-72 animate-pulse bg-gradient-to-br from-slate-700/40 via-slate-600/20 to-slate-800/40">
               <div className="absolute inset-0 bg-gradient-to-t from-[#0d1424] to-transparent" />
               <div className="absolute bottom-5 left-5 right-5 space-y-2">
@@ -150,23 +150,25 @@ function PublicProfilePage() {
 
   if (!profile) {
     return (
-      <div className="min-h-screen bg-[#090d17] px-4 py-10 text-slate-200">
-        <div className="mx-auto w-full max-w-md">
-          <Card className="border-slate-700/50 bg-[#10182a] p-6 text-center text-slate-300">Profile not found.</Card>
+      <div className="min-h-screen bg-[#090d17] text-slate-200">
+        <div className="w-full">
+          <Card className="min-h-screen rounded-none border-slate-700/50 bg-[#10182a] p-6 text-center text-slate-300 md:mx-auto md:min-h-[100dvh] md:max-w-md md:rounded-[28px]">
+            Profile not found.
+          </Card>
         </div>
       </div>
     )
   }
 
   const pageThemeClass = isDarkTheme
-    ? 'min-h-screen bg-[radial-gradient(circle_at_top,rgba(37,99,235,0.25),transparent_40%),#090d17] px-4 py-8 text-slate-100'
+    ? 'min-h-screen bg-[radial-gradient(circle_at_top,rgba(37,99,235,0.25),transparent_40%),#090d17] text-slate-100'
     : isLightGlassTheme
-      ? 'min-h-screen bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.2),transparent_40%),#eef5ff] px-4 py-8 text-slate-900'
-      : 'min-h-screen bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.3),transparent_40%),#eaf2ff] px-4 py-8 text-slate-900'
+      ? 'min-h-screen bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.2),transparent_40%),#eef5ff] text-slate-900'
+      : 'min-h-screen bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.3),transparent_40%),#eaf2ff] text-slate-900'
 
   const shellClass = isDarkTheme
-    ? 'overflow-hidden rounded-[28px] border border-white/10 bg-[#0d1424] shadow-[0_24px_70px_rgba(0,0,0,0.45)]'
-    : 'overflow-hidden rounded-[28px] border border-slate-200 bg-white/80 shadow-[0_24px_70px_rgba(15,23,42,0.18)] backdrop-blur'
+    ? 'min-h-screen overflow-hidden border border-white/10 bg-[#0d1424] shadow-[0_24px_70px_rgba(0,0,0,0.45)] md:mx-auto md:min-h-[100dvh] md:max-w-md md:rounded-[28px]'
+    : 'min-h-screen overflow-hidden border border-slate-200 bg-white/80 shadow-[0_24px_70px_rgba(15,23,42,0.18)] backdrop-blur md:mx-auto md:min-h-[100dvh] md:max-w-md md:rounded-[28px]'
 
   const heroOverlayClass = isDarkTheme
     ? 'absolute inset-0 bg-gradient-to-t from-[#0d1424] via-[#0d1424]/55 to-transparent'
@@ -191,7 +193,7 @@ function PublicProfilePage() {
 
   return (
     <div className={pageThemeClass}>
-      <div className="mx-auto w-full max-w-md">
+      <div className="w-full">
         <div className={shellClass}>
           <div className="relative h-72 overflow-hidden">
             <img
@@ -376,7 +378,7 @@ function PublicProfilePage() {
           </div>
         </div>
 
-        <p className="mt-3 text-center text-xs text-slate-500">Powered by Connetme pvt Ltd</p>
+        <p className="py-3 text-center text-xs text-slate-500">Powered by Connetme pvt Ltd</p>
       </div>
     </div>
   )

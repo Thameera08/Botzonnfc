@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { KeyRound } from 'lucide-react'
+import { KeyRound, PencilLine } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -8,12 +8,12 @@ import Card from '../../components/ui/Card'
 import Input from '../../components/ui/Input'
 import Table from '../../components/ui/Table'
 import Toggle from '../../components/ui/Toggle'
-import { createAdminUser, getAdminUsers, resetAdminUserPassword, updateAdminUserStatus } from '../../services/api/authApi'
+import { createAdminUser, getAdminUsers, resetAdminUserPassword, updateAdminUser, updateAdminUserStatus } from '../../services/api/authApi'
 
 const schema = z.object({
   full_name: z.string().min(2, 'Name is required'),
   email: z.string().email('Enter a valid email'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  password: z.string().optional(),
   profile_image_url: z.string().optional(),
   status: z.enum(['ACTIVE', 'DISABLED']),
 })
@@ -26,6 +26,7 @@ function AdminUsersPage() {
   const [newPassword, setNewPassword] = useState('')
   const [passwordMessage, setPasswordMessage] = useState('')
   const [savingPassword, setSavingPassword] = useState(false)
+  const [editingUser, setEditingUser] = useState(null)
 
   const {
     register,
@@ -64,11 +65,27 @@ function AdminUsersPage() {
     setApiError('')
 
     try {
-      await createAdminUser(values)
+      if (!editingUser && (!values.password || values.password.length < 6)) {
+        setApiError('Password must be at least 6 characters')
+        return
+      }
+
+      if (editingUser) {
+        await updateAdminUser(editingUser.id || editingUser._id, {
+          full_name: values.full_name,
+          email: values.email,
+          profile_image_url: values.profile_image_url,
+          status: values.status,
+        })
+      } else {
+        await createAdminUser(values)
+      }
+
       reset({ full_name: '', email: '', password: '', profile_image_url: '', status: 'ACTIVE' })
+      setEditingUser(null)
       await loadUsers()
     } catch (error) {
-      setApiError(error.response?.data?.message || 'Unable to create admin user')
+      setApiError(error.response?.data?.message || `Unable to ${editingUser ? 'update' : 'create'} admin user`)
     }
   }
 
@@ -147,6 +164,23 @@ function AdminUsersPage() {
       render: (row) => (
         <div className="flex items-center gap-2">
           <Toggle checked={row.status === 'ACTIVE'} label="Admin access" onChange={() => handleToggleStatus(row)} />
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => {
+              setEditingUser(row)
+              setApiError('')
+              reset({
+                full_name: row.full_name || '',
+                email: row.email || '',
+                password: '',
+                profile_image_url: row.profile_image_url || '',
+                status: row.status || 'ACTIVE',
+              })
+            }}
+          >
+            <PencilLine size={14} className="mr-1" /> Edit
+          </Button>
           <Button variant="secondary" size="sm" onClick={() => { setPasswordTarget(row); setPasswordMessage(''); setNewPassword('') }}>
             <KeyRound size={14} className="mr-1" /> Reset Password
           </Button>
@@ -158,8 +192,8 @@ function AdminUsersPage() {
   return (
     <div className="space-y-4">
       <Card className="p-5">
-        <h2 className="text-lg font-semibold text-slate-900">Create Admin Account</h2>
-        <p className="mt-1 text-sm text-slate-600">Create admin profile accounts, control access, and reset passwords.</p>
+        <h2 className="text-lg font-semibold text-slate-900">{editingUser ? 'Edit Admin Account' : 'Create Admin Account'}</h2>
+        <p className="mt-1 text-sm text-slate-600">Create and edit admin profile accounts, control access, and reset passwords.</p>
 
         <form className="mt-4 grid gap-3 md:grid-cols-5" onSubmit={handleSubmit(onSubmit)}>
           <input type="hidden" {...register('profile_image_url')} />
@@ -167,7 +201,13 @@ function AdminUsersPage() {
           <div className="md:col-span-2">
             <Input label="Admin Email" placeholder="new-admin@connetme.com" error={errors.email?.message} {...register('email')} />
           </div>
-          <Input label="Password" type="password" placeholder="******" error={errors.password?.message} {...register('password')} />
+          <Input
+            label={editingUser ? 'Password (optional)' : 'Password'}
+            type="password"
+            placeholder={editingUser ? 'Leave blank to keep current password' : '******'}
+            error={errors.password?.message}
+            {...register('password')}
+          />
           <label className="flex w-full flex-col gap-1.5">
             <span className="text-sm font-medium text-slate-700">Initial Status</span>
             <select
@@ -196,7 +236,20 @@ function AdminUsersPage() {
           </div>
 
           <div className="md:col-span-5 flex items-center gap-3">
-            <Button type="submit" loading={isSubmitting}>Create Admin User</Button>
+            <Button type="submit" loading={isSubmitting}>{editingUser ? 'Save Changes' : 'Create Admin User'}</Button>
+            {editingUser ? (
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => {
+                  setEditingUser(null)
+                  setApiError('')
+                  reset({ full_name: '', email: '', password: '', profile_image_url: '', status: 'ACTIVE' })
+                }}
+              >
+                Cancel Edit
+              </Button>
+            ) : null}
             {apiError ? <p className="text-sm text-rose-600">{apiError}</p> : null}
           </div>
         </form>

@@ -346,7 +346,7 @@ function PublicProfilePage() {
           </div>
         </div>
 
-        <p className="mt-3 text-center text-xs text-slate-500">Minimal digital profile</p>
+        <p className="mt-3 text-center text-xs text-slate-500">Powered by Connetme pvt Ltd</p>
       </div>
     </div>
   )

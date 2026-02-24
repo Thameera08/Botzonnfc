@@ -1,0 +1,22 @@
+<svg width="460" height="140" viewBox="0 0 460 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="cmBlue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#123B77"/>
+      <stop offset="100%" stop-color="#0D2C5C"/>
+    </linearGradient>
+    <linearGradient id="cmGreen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#A6EC57"/>
+      <stop offset="100%" stop-color="#85D13A"/>
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(8,8)">
+    <path d="M58 8C30 8 8 30 8 58C8 86 30 108 58 108V95C37 95 21 79 21 58C21 37 37 21 58 21C70 21 81 26 88 34L97 24C87 14 73 8 58 8Z" fill="url(#cmBlue)"/>
+    <path d="M58 108C86 108 108 86 108 58C108 43 102 29 92 18L83 28C90 36 95 47 95 58C95 79 79 95 58 95V108Z" fill="url(#cmGreen)"/>
+    <path d="M45 40H59L74 56L89 40H101V76H88V58L74 72L59 58V76H45V40Z" fill="url(#cmGreen)"/>
+  </g>
+
+  <text x="132" y="92" font-size="66" font-family="Inter,Segoe UI,Arial,sans-serif" font-weight="700">
+    <tspan fill="#123B77">Connect</tspan><tspan fill="#9CE54F">Me</tspan>
+  </text>
+</svg>

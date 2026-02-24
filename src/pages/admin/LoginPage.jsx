@@ -5,6 +5,7 @@ import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { z } from 'zod'
 import Button from '../../components/ui/Button'
 import Card from '../../components/ui/Card'
+import BrandLogo from '../../components/common/BrandLogo'
 import Input from '../../components/ui/Input'
 import { login } from '../../services/api/authApi'
 import { isAuthenticated, setToken } from '../../utils/auth'
@@ -55,6 +56,7 @@ function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-10">
       <Card className="w-full max-w-md p-6">
+        <BrandLogo className="mb-4" />
         <h1 className="text-2xl font-bold text-slate-900">ConnetMe Admin Login</h1>
         <p className="mt-1 text-sm text-slate-600">Sign in to manage business profiles and user access.</p>
 

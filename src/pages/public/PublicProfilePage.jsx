@@ -15,6 +15,7 @@ import {
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import Card from '../../components/ui/Card'
+import BrandLogo from '../../components/common/BrandLogo'
 import { getPublicProfile } from '../../services/api/profileApi'
 
 function PublicProfilePage() {
@@ -378,7 +379,10 @@ function PublicProfilePage() {
           </div>
         </div>
 
-        <p className="py-3 text-center text-xs text-slate-500">Powered by Connetme pvt Ltd</p>
+        <div className="flex flex-col items-center gap-1 py-3">
+          <BrandLogo compact className="opacity-85" />
+          <p className="text-center text-xs text-slate-500">Powered by ConnectMe</p>
+        </div>
       </div>
     </div>
   )

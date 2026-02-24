@@ -1,6 +1,7 @@
 import { LayoutDashboard, LogOut, Shield, UserCircle2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
+import BrandLogo from '../common/BrandLogo'
 import { clearToken } from '../../utils/auth'
 import { subscribeRequestState } from '../../utils/requestLoader'
 
@@ -30,9 +31,9 @@ function AdminLayout() {
         <aside className="modern-panel w-full rounded-2xl p-3 md:sticky md:top-4 md:h-fit md:w-64">
           <Link
             to="/admin/dashboard"
-            className="mb-4 block rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 px-3 py-2 text-sm font-semibold text-white shadow-[0_10px_20px_rgba(15,111,255,0.28)]"
+            className="mb-4 block rounded-xl bg-white px-3 py-2 shadow-[0_10px_20px_rgba(15,111,255,0.14)]"
           >
-            ConnetMe Admin
+            <BrandLogo compact />
           </Link>
           <nav className="space-y-1">
             {navItems.map((item) => {

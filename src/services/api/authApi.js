@@ -19,3 +19,8 @@ export const updateAdminUserStatus = async (id, status) => {
   const response = await api.patch(`/admin/users/${id}/status`, { status })
   return response.data
 }
+
+export const resetAdminUserPassword = async (id, password) => {
+  const response = await api.patch(`/admin/users/${id}/password`, { password })
+  return response.data
+}

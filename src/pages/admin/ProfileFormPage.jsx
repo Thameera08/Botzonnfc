@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Download } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { toPng } from 'html-to-image'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { z } from 'zod'
@@ -60,6 +61,9 @@ function ProfileFormPage({ mode }) {
   const [loadingProfile, setLoadingProfile] = useState(mode === 'edit')
   const [qrImage, setQrImage] = useState('')
   const [imagePreview, setImagePreview] = useState('')
+  const [downloadingCard, setDownloadingCard] = useState('')
+  const cardFrontRef = useRef(null)
+  const cardBackRef = useRef(null)
 
   const {
     register,
@@ -75,6 +79,10 @@ function ProfileFormPage({ mode }) {
 
   const status = watch('status')
   const selectedTheme = watch('public_theme')
+  const fullName = watch('full_name')
+  const designation = watch('designation')
+  const companyName = watch('company_name')
+  const usernameValue = watch('username')
 
   const fileToDataUrl = (file) =>
     new Promise((resolve, reject) => {
@@ -117,6 +125,23 @@ function ProfileFormPage({ mode }) {
   }, [id, mode, reset])
 
   const formTitle = useMemo(() => (mode === 'edit' ? 'Edit Profile' : 'Create Profile'), [mode])
+
+  const downloadCardPng = async (targetRef, side) => {
+    if (!targetRef.current) return
+
+    try {
+      setDownloadingCard(side)
+      const dataUrl = await toPng(targetRef.current, { cacheBust: true, pixelRatio: 3 })
+      const link = document.createElement('a')
+      link.href = dataUrl
+      link.download = `${usernameValue || 'profile'}-nfc-card-${side}.png`
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+    } finally {
+      setDownloadingCard('')
+    }
+  }
 
   const onSubmit = async (values) => {
     if (mode === 'edit') {
@@ -247,6 +272,84 @@ function ProfileFormPage({ mode }) {
           </div>
         </div>
       </form>
+
+      <div className="mt-5 rounded-lg border border-slate-200 bg-slate-50 p-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <p className="text-sm font-medium text-slate-800">NFC Business Card Preview</p>
+            <p className="text-xs text-slate-500">Card text uses Connet Me branding (no “Let’s Talk”).</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
+              loading={downloadingCard === 'front'}
+              onClick={() => downloadCardPng(cardFrontRef, 'front')}
+            >
+              <Download size={14} className="mr-2" /> Download Front
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              loading={downloadingCard === 'back'}
+              onClick={() => downloadCardPng(cardBackRef, 'back')}
+            >
+              <Download size={14} className="mr-2" /> Download Back
+            </Button>
+          </div>
+        </div>
+
+        <div className="mt-4 grid gap-4 lg:grid-cols-2">
+          <div className="rounded-xl border border-slate-200 bg-white p-3">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Front Side</p>
+            <div
+              ref={cardFrontRef}
+              className="relative mx-auto h-[210px] w-[340px] overflow-hidden rounded-2xl bg-gradient-to-br from-[#0f75d9] to-[#0855a8] text-white shadow-[0_12px_30px_rgba(6,37,79,0.35)]"
+            >
+              <div className="absolute left-4 top-4 max-w-[180px]">
+                <p className="text-[20px] font-black uppercase leading-tight">{fullName || 'FULL NAME'}</p>
+                <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-white/85">{designation || 'Designation'}</p>
+              </div>
+
+              <div className="absolute bottom-4 left-4 h-[86px] w-[86px] rounded-lg bg-white p-1.5 shadow-md">
+                {qrImage ? (
+                  <img src={qrImage} alt="QR code" className="h-full w-full rounded object-cover" />
+                ) : (
+                  <div className="grid h-full w-full place-items-center rounded border border-slate-200 text-[10px] font-semibold text-slate-500">
+                    QR AFTER SAVE
+                  </div>
+                )}
+              </div>
+
+              <div className="absolute -right-3 top-3 text-[76px] font-black leading-[0.9] text-white/92 [writing-mode:vertical-rl]">
+                CONNET ME
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-slate-200 bg-white p-3">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Back Side</p>
+            <div
+              ref={cardBackRef}
+              className="relative mx-auto h-[210px] w-[340px] overflow-hidden rounded-2xl border border-slate-200 bg-[#f6fbff] text-slate-900 shadow-[0_12px_30px_rgba(15,23,42,0.18)]"
+            >
+              <div className="absolute -left-8 -top-8 h-24 w-24 rounded-full bg-blue-100/70" />
+              <div className="absolute -bottom-10 left-16 h-24 w-24 rounded-full bg-blue-100/70" />
+              <div className="absolute bottom-8 right-10 h-12 w-12 rounded-full bg-blue-200/70" />
+
+              <div className="absolute right-5 top-4 text-xl text-blue-700">◉</div>
+
+              <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
+                <p className="text-4xl font-black uppercase tracking-tight text-blue-700">{companyName || 'CONNETME'}</p>
+                <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                  {designation || 'Digital NFC Business Card'}
+                </p>
+                <p className="mt-2 text-[11px] text-slate-500">Tap with NFC or scan QR to open profile</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {qrImage ? (
         <div className="mt-5 rounded-lg border border-slate-200 bg-slate-50 p-4">

@@ -1,5 +1,5 @@
 import {
-  ChevronRight,
+  ArrowUpRight,
   Copy,
   Facebook,
   Globe,
@@ -40,9 +40,9 @@ function PublicProfilePage() {
   }, [username])
 
   const disabled = profile?.status === 'DISABLED'
-  const profileLink = window.location.href
+  const profileLink = typeof window !== 'undefined' ? window.location.href : ''
 
-  const socialCircles = useMemo(
+  const socialLinks = useMemo(
     () => [
       { icon: Linkedin, href: profile?.linkedin_url, label: 'LinkedIn' },
       { icon: Facebook, href: profile?.facebook_url, label: 'Facebook' },
@@ -53,23 +53,23 @@ function PublicProfilePage() {
     [profile],
   )
 
-  const infoTiles = useMemo(
+  const detailLinks = useMemo(
     () => [
       {
-        title: 'Facebook',
-        subtitle: 'Live up on Facebook',
+        label: 'Facebook',
+        subtitle: 'Open Facebook profile',
         icon: Facebook,
         href: profile?.facebook_url,
       },
       {
-        title: 'Instagram',
-        subtitle: 'Follow us on Instagram',
+        label: 'Instagram',
+        subtitle: 'Open Instagram profile',
         icon: Instagram,
         href: profile?.instagram_url,
       },
       {
-        title: 'Our Website',
-        subtitle: 'Visit for more information',
+        label: 'Website',
+        subtitle: 'Visit company details',
         icon: Globe,
         href: profile?.company_name ? `https://www.google.com/search?q=${encodeURIComponent(profile.company_name)}` : '',
       },
@@ -87,9 +87,10 @@ function PublicProfilePage() {
   }
 
   const handleCopy = async () => {
+    if (!profileLink) return
     await navigator.clipboard.writeText(profileLink)
-    setCopyMessage('Profile link copied')
-    setTimeout(() => setCopyMessage(''), 1600)
+    setCopyMessage('Link copied')
+    setTimeout(() => setCopyMessage(''), 1500)
   }
 
   const handleShare = async () => {
@@ -106,199 +107,214 @@ function PublicProfilePage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center px-4 py-10">
-        <Card className="w-full max-w-md p-6 text-center text-slate-600">Loading profile...</Card>
+      <div className="min-h-screen bg-[#090d17] px-4 py-10 text-slate-200">
+        <div className="mx-auto w-full max-w-md">
+          <Card className="border-slate-700/50 bg-[#10182a] p-6 text-center text-slate-300">Loading profile...</Card>
+        </div>
       </div>
     )
   }
 
   if (!profile) {
     return (
-      <div className="flex min-h-screen items-center justify-center px-4 py-10">
-        <Card className="w-full max-w-md p-6 text-center text-slate-600">Profile not found.</Card>
+      <div className="min-h-screen bg-[#090d17] px-4 py-10 text-slate-200">
+        <div className="mx-auto w-full max-w-md">
+          <Card className="border-slate-700/50 bg-[#10182a] p-6 text-center text-slate-300">Profile not found.</Card>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen px-4 py-6">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(37,99,235,0.25),transparent_40%),#090d17] px-4 py-8 text-slate-100">
       <div className="mx-auto w-full max-w-md">
-        <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-[#f4f7ff] shadow-[0_24px_60px_rgba(15,17,24,0.28)]">
-          <div className="relative h-[360px] overflow-hidden">
+        <div className="overflow-hidden rounded-[28px] border border-white/10 bg-[#0d1424] shadow-[0_24px_70px_rgba(0,0,0,0.45)]">
+          <div className="relative h-72 overflow-hidden">
             <img
               src={profile.profile_image_url || 'https://placehold.co/600x800'}
               alt={profile.full_name}
               className="h-full w-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/78 via-black/40 to-black/20" />
-
-            <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
-              <p className="text-4xl font-black uppercase leading-[0.95] tracking-wide">{profile.full_name}</p>
-              <p className="mt-2 text-sm font-medium text-white/90">{profile.designation || 'Professional'}</p>
-              <p className="text-xs text-white/80">{profile.company_name || 'Company'}</p>
-
-              <div className="mt-4 flex gap-2">
-                {socialCircles.map((social) => {
-                  const Icon = social.icon
-                  const blocked = disabled || !social.href
-                  return (
-                    <button
-                      key={social.label}
-                      type="button"
-                      title={social.label}
-                      onClick={() => openSafe(social.href)}
-                      disabled={blocked}
-                      className={`grid h-10 w-10 place-items-center rounded-full border text-white transition ${
-                        blocked
-                          ? 'cursor-not-allowed border-white/30 bg-white/10 text-white/50'
-                          : 'border-white/50 bg-white/20 hover:bg-white/30'
-                      }`}
-                    >
-                      <Icon size={17} />
-                    </button>
-                  )
-                })}
-              </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0d1424] via-[#0d1424]/55 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 p-5">
+              <h1 className="text-4xl font-bold uppercase tracking-tight text-white">{profile.full_name}</h1>
+              <p className="mt-1 text-sm text-slate-200">{profile.designation || 'Professional'}</p>
+              <p className="text-xs text-slate-400">{profile.company_name || 'Company'}</p>
             </div>
           </div>
 
-          <div className="min-h-[calc(100%-360px)] bg-gradient-to-b from-[#111827] to-[#f4f7ff] px-4 pb-8 pt-4">
+          <div className="space-y-3 bg-[#0d1424] p-4">
             {disabled ? (
-              <div className="mb-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-700">
+              <div className="rounded-xl border border-amber-700/40 bg-amber-900/20 px-3 py-2 text-xs text-amber-200">
                 This business profile is currently unavailable.
               </div>
             ) : null}
 
-            <div className="rounded-2xl bg-white/95 p-4 shadow-lg">
-              <p className="text-sm font-semibold text-slate-900">About Me</p>
-              <p className="mt-2 text-sm leading-relaxed text-slate-600">{profile.bio || 'Welcome to my digital business profile.'}</p>
-
-              <div className="mt-4 space-y-2">
-                <button
-                  type="button"
-                  onClick={() => openSafe(`mailto:${profile.email}`, true)}
-                  disabled={disabled}
-                  className={`flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left ${
-                    disabled ? 'cursor-not-allowed border-slate-200 text-slate-400' : 'border-slate-200 hover:bg-slate-50'
-                  }`}
-                >
-                  <span className="flex items-center gap-2 text-sm text-slate-700">
-                    <Mail size={16} /> {profile.email}
-                  </span>
-                  <ChevronRight size={16} className="text-slate-400" />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => openSafe(`tel:${profile.phone}`, true)}
-                  disabled={disabled}
-                  className={`flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left ${
-                    disabled ? 'cursor-not-allowed border-slate-200 text-slate-400' : 'border-slate-200 hover:bg-slate-50'
-                  }`}
-                >
-                  <span className="flex items-center gap-2 text-sm text-slate-700">
-                    <Phone size={16} /> {profile.phone}
-                  </span>
-                  <ChevronRight size={16} className="text-slate-400" />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => openSafe(`https://maps.google.com/?q=${encodeURIComponent(profile.location || '')}`)}
-                  disabled={disabled || !profile.location}
-                  className={`flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left ${
-                    disabled || !profile.location
-                      ? 'cursor-not-allowed border-slate-200 text-slate-400'
-                      : 'border-slate-200 hover:bg-slate-50'
-                  }`}
-                >
-                  <span className="flex items-center gap-2 text-sm text-slate-700">
-                    <MapPin size={16} /> {profile.location || 'Location unavailable'}
-                  </span>
-                  <ChevronRight size={16} className="text-slate-400" />
-                </button>
-              </div>
-            </div>
-
-            <div className="mt-3 space-y-2">
-              {infoTiles.map((tile) => {
-                const Icon = tile.icon
-                const blocked = disabled || !tile.href
+            <div className="grid grid-cols-5 gap-2">
+              {socialLinks.map((item) => {
+                const Icon = item.icon
+                const blocked = disabled || !item.href
 
                 return (
                   <button
-                    key={tile.title}
+                    key={item.label}
                     type="button"
-                    onClick={() => openSafe(tile.href)}
+                    title={item.label}
                     disabled={blocked}
-                    className={`flex w-full items-center justify-between rounded-2xl bg-white px-4 py-3 text-left shadow-sm transition ${
-                      blocked ? 'cursor-not-allowed opacity-55' : 'hover:bg-slate-50'
+                    onClick={() => openSafe(item.href)}
+                    className={`flex h-10 items-center justify-center rounded-xl border text-sm transition ${
+                      blocked
+                        ? 'cursor-not-allowed border-slate-700 bg-slate-800/40 text-slate-500'
+                        : 'border-slate-600/70 bg-slate-800/50 text-slate-100 hover:bg-slate-700/70'
                     }`}
                   >
-                    <div className="flex items-center gap-3">
-                      <span className="grid h-9 w-9 place-items-center rounded-xl bg-blue-100 text-blue-600">
-                        <Icon size={16} />
-                      </span>
-                      <span>
-                        <p className="text-sm font-semibold text-slate-900">{tile.title}</p>
-                        <p className="text-xs text-slate-500">{tile.subtitle}</p>
-                      </span>
-                    </div>
-                    <ChevronRight size={16} className="text-slate-400" />
+                    <Icon size={16} />
                   </button>
                 )
               })}
             </div>
 
-            <div className="mt-3 rounded-2xl bg-white p-3 shadow-sm">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Quick Actions</p>
-              <div className="grid grid-cols-4 gap-2">
-                <button
-                  type="button"
-                  disabled={disabled}
-                  onClick={() => openSafe(`tel:${profile.phone}`, true)}
-                  className={`inline-flex flex-col items-center justify-center rounded-xl py-2 text-[11px] font-semibold ${
-                    disabled ? 'cursor-not-allowed text-slate-400' : 'text-slate-700 hover:bg-slate-100'
-                  }`}
-                >
-                  <Phone size={16} />
-                  Call
-                </button>
-                <button
-                  type="button"
-                  disabled={disabled}
-                  onClick={() => openSafe(`mailto:${profile.email}`, true)}
-                  className={`inline-flex flex-col items-center justify-center rounded-xl py-2 text-[11px] font-semibold ${
-                    disabled ? 'cursor-not-allowed text-slate-400' : 'text-slate-700 hover:bg-slate-100'
-                  }`}
-                >
-                  <Mail size={16} />
-                  Email
-                </button>
-                <button
-                  type="button"
-                  onClick={handleShare}
-                  className="inline-flex flex-col items-center justify-center rounded-xl py-2 text-[11px] font-semibold text-slate-700 hover:bg-slate-100"
-                >
-                  <Share2 size={16} />
-                  Share
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCopy}
-                  className="inline-flex flex-col items-center justify-center rounded-xl py-2 text-[11px] font-semibold text-slate-700 hover:bg-slate-100"
-                >
-                  <Copy size={16} />
-                  Copy
-                </button>
-              </div>
-              {copyMessage ? <p className="mt-1 text-center text-xs font-medium text-emerald-600">{copyMessage}</p> : null}
+            <div className="rounded-2xl border border-slate-700/60 bg-[#121b2f] p-4">
+              <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">About</p>
+              <p className="mt-2 text-sm leading-relaxed text-slate-200">{profile.bio || 'Welcome to my digital business profile.'}</p>
             </div>
 
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                disabled={disabled}
+                onClick={() => openSafe(`tel:${profile.phone}`, true)}
+                className={`rounded-xl border px-3 py-2 text-sm font-medium transition ${
+                  disabled
+                    ? 'cursor-not-allowed border-slate-700 bg-slate-800/40 text-slate-500'
+                    : 'border-slate-600 bg-slate-800/50 text-slate-100 hover:bg-slate-700/70'
+                }`}
+              >
+                <span className="inline-flex items-center gap-2">
+                  <Phone size={14} /> Call
+                </span>
+              </button>
+              <button
+                type="button"
+                disabled={disabled}
+                onClick={() => openSafe(`mailto:${profile.email}`, true)}
+                className={`rounded-xl border px-3 py-2 text-sm font-medium transition ${
+                  disabled
+                    ? 'cursor-not-allowed border-slate-700 bg-slate-800/40 text-slate-500'
+                    : 'border-slate-600 bg-slate-800/50 text-slate-100 hover:bg-slate-700/70'
+                }`}
+              >
+                <span className="inline-flex items-center gap-2">
+                  <Mail size={14} /> Email
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={handleShare}
+                className="rounded-xl border border-slate-600 bg-slate-800/50 px-3 py-2 text-sm font-medium text-slate-100 transition hover:bg-slate-700/70"
+              >
+                <span className="inline-flex items-center gap-2">
+                  <Share2 size={14} /> Share
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={handleCopy}
+                className="rounded-xl border border-slate-600 bg-slate-800/50 px-3 py-2 text-sm font-medium text-slate-100 transition hover:bg-slate-700/70"
+              >
+                <span className="inline-flex items-center gap-2">
+                  <Copy size={14} /> Copy
+                </span>
+              </button>
+            </div>
+
+            {copyMessage ? <p className="text-center text-xs text-emerald-300">{copyMessage}</p> : null}
+
+            <div className="space-y-2">
+              <button
+                type="button"
+                disabled={disabled}
+                onClick={() => openSafe(`mailto:${profile.email}`, true)}
+                className={`flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left ${
+                  disabled
+                    ? 'cursor-not-allowed border-slate-700 bg-slate-800/40 text-slate-500'
+                    : 'border-slate-700 bg-slate-800/40 text-slate-100 hover:bg-slate-700/60'
+                }`}
+              >
+                <span className="inline-flex items-center gap-2 text-sm">
+                  <Mail size={15} /> {profile.email}
+                </span>
+                <ArrowUpRight size={15} className="text-slate-400" />
+              </button>
+
+              <button
+                type="button"
+                disabled={disabled}
+                onClick={() => openSafe(`tel:${profile.phone}`, true)}
+                className={`flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left ${
+                  disabled
+                    ? 'cursor-not-allowed border-slate-700 bg-slate-800/40 text-slate-500'
+                    : 'border-slate-700 bg-slate-800/40 text-slate-100 hover:bg-slate-700/60'
+                }`}
+              >
+                <span className="inline-flex items-center gap-2 text-sm">
+                  <Phone size={15} /> {profile.phone}
+                </span>
+                <ArrowUpRight size={15} className="text-slate-400" />
+              </button>
+
+              <button
+                type="button"
+                disabled={disabled || !profile.location}
+                onClick={() => openSafe(`https://maps.google.com/?q=${encodeURIComponent(profile.location || '')}`)}
+                className={`flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left ${
+                  disabled || !profile.location
+                    ? 'cursor-not-allowed border-slate-700 bg-slate-800/40 text-slate-500'
+                    : 'border-slate-700 bg-slate-800/40 text-slate-100 hover:bg-slate-700/60'
+                }`}
+              >
+                <span className="inline-flex items-center gap-2 text-sm">
+                  <MapPin size={15} /> {profile.location || 'Location unavailable'}
+                </span>
+                <ArrowUpRight size={15} className="text-slate-400" />
+              </button>
+            </div>
+
+            <div className="space-y-2">
+              {detailLinks.map((item) => {
+                const Icon = item.icon
+                const blocked = disabled || !item.href
+
+                return (
+                  <button
+                    key={item.label}
+                    type="button"
+                    disabled={blocked}
+                    onClick={() => openSafe(item.href)}
+                    className={`flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left transition ${
+                      blocked
+                        ? 'cursor-not-allowed border-slate-700 bg-slate-800/40 text-slate-500'
+                        : 'border-slate-700 bg-slate-800/40 text-slate-100 hover:bg-slate-700/60'
+                    }`}
+                  >
+                    <span className="inline-flex items-center gap-2">
+                      <span className="grid h-8 w-8 place-items-center rounded-lg bg-blue-500/20 text-blue-300">
+                        <Icon size={15} />
+                      </span>
+                      <span>
+                        <p className="text-sm font-medium">{item.label}</p>
+                        <p className="text-xs text-slate-400">{item.subtitle}</p>
+                      </span>
+                    </span>
+                    <ArrowUpRight size={15} className="text-slate-400" />
+                  </button>
+                )
+              })}
+            </div>
           </div>
         </div>
 
-        <div className="mt-4 flex items-center justify-center gap-2 text-xs text-slate-500">Powered digital profile</div>
+        <p className="mt-3 text-center text-xs text-slate-500">Minimal digital profile</p>
       </div>
     </div>
   )

@@ -7,7 +7,8 @@ import Input from '../../components/ui/Input'
 import Modal from '../../components/ui/Modal'
 import Table from '../../components/ui/Table'
 import Toggle from '../../components/ui/Toggle'
-import { createProfileLogin, getProfiles, updateProfileStatus } from '../../services/api/profileApi'
+import { getAdminUsers } from '../../services/api/authApi'
+import { assignProfileOwner, getProfiles, updateProfileStatus } from '../../services/api/profileApi'
 import { downloadImage } from '../../utils/download'
 import { getAuthUser } from '../../utils/auth'
 
@@ -22,10 +23,11 @@ function ProfilesPage() {
   const [status, setStatus] = useState('')
   const [page, setPage] = useState(1)
   const [confirmData, setConfirmData] = useState(null)
-  const [loginTarget, setLoginTarget] = useState(null)
-  const [loginForm, setLoginForm] = useState({ admin_full_name: '', admin_email: '', admin_password: '' })
-  const [savingLogin, setSavingLogin] = useState(false)
-  const [loginMessage, setLoginMessage] = useState('')
+  const [assignTarget, setAssignTarget] = useState(null)
+  const [adminUsers, setAdminUsers] = useState([])
+  const [selectedOwnerId, setSelectedOwnerId] = useState('')
+  const [assigningOwner, setAssigningOwner] = useState(false)
+  const [assignMessage, setAssignMessage] = useState('')
 
   const fetchProfiles = async () => {
     setLoading(true)
@@ -50,11 +52,38 @@ function ProfilesPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, status])
 
+  useEffect(() => {
+    const loadAdmins = async () => {
+      if (authUser?.role !== 'SUPER_ADMIN') return
+      const response = await getAdminUsers()
+      setAdminUsers(response?.items || response?.data?.items || [])
+    }
+
+    loadAdmins()
+  }, [authUser?.role])
+
   const columns = useMemo(
     () => [
       { key: 'full_name', title: 'Full Name' },
       { key: 'username', title: 'Username' },
       { key: 'company_name', title: 'Company' },
+      ...(authUser?.role === 'SUPER_ADMIN'
+        ? [
+            {
+              key: 'owner_admin_id',
+              title: 'Assigned Admin',
+              render: (row) => {
+                const assigned = adminUsers.find((admin) => (admin.id || admin._id) === row.owner_admin_id)
+                if (!assigned) return <span className="text-xs text-slate-400">Unassigned</span>
+                return (
+                  <span className="text-xs font-medium text-slate-700">
+                    {assigned.full_name}
+                  </span>
+                )
+              },
+            },
+          ]
+        : []),
       {
         key: 'status',
         title: 'Status',
@@ -119,21 +148,17 @@ function ProfilesPage() {
                   })
                 }
               />
-              {authUser?.role === 'SUPER_ADMIN' && !row.owner_admin_id ? (
+              {authUser?.role === 'SUPER_ADMIN' ? (
                 <button
                   type="button"
                   onClick={() => {
-                    setLoginMessage('')
-                    setLoginTarget(row)
-                    setLoginForm({
-                      admin_full_name: row.full_name || '',
-                      admin_email: row.email || '',
-                      admin_password: '',
-                    })
+                    setAssignMessage('')
+                    setAssignTarget(row)
+                    setSelectedOwnerId(row.owner_admin_id || '')
                   }}
                   className="inline-flex h-8 items-center gap-1 rounded-lg border border-slate-200 px-2 text-xs font-medium text-slate-700 transition hover:bg-slate-100"
                 >
-                  Create Login
+                  Assign Admin
                 </button>
               ) : null}
             </div>
@@ -141,7 +166,7 @@ function ProfilesPage() {
         },
       },
     ],
-    [],
+    [adminUsers, authUser?.role],
   )
 
   const handleSearch = async (event) => {
@@ -158,31 +183,22 @@ function ProfilesPage() {
     await fetchProfiles()
   }
 
-  const handleCreateLogin = async () => {
-    if (!loginTarget) return
-    if (!loginForm.admin_full_name.trim() || !loginForm.admin_email.trim() || loginForm.admin_password.length < 6) {
-      setLoginMessage('Name, email and password (min 6 chars) are required.')
-      return
-    }
-
-    setSavingLogin(true)
-    setLoginMessage('')
+  const handleAssignOwner = async () => {
+    if (!assignTarget) return
+    setAssigningOwner(true)
+    setAssignMessage('')
     try {
-      await createProfileLogin(loginTarget.id, {
-        admin_full_name: loginForm.admin_full_name.trim(),
-        admin_email: loginForm.admin_email.trim().toLowerCase(),
-        admin_password: loginForm.admin_password,
-      })
-      setLoginMessage('Login created successfully.')
+      await assignProfileOwner(assignTarget.id, selectedOwnerId || null)
+      setAssignMessage('Profile assignment updated.')
       await fetchProfiles()
       setTimeout(() => {
-        setLoginTarget(null)
-        setLoginMessage('')
+        setAssignTarget(null)
+        setAssignMessage('')
       }, 900)
     } catch (error) {
-      setLoginMessage(error.response?.data?.message || 'Unable to create login')
+      setAssignMessage(error.response?.data?.message || 'Unable to assign profile')
     } finally {
-      setSavingLogin(false)
+      setAssigningOwner(false)
     }
   }
 
@@ -256,35 +272,33 @@ function ProfilesPage() {
       />
 
       <Modal
-        open={Boolean(loginTarget)}
-        title="Create Admin Login"
-        description={loginTarget ? `Create login for ${loginTarget.full_name} (${loginTarget.username})` : ''}
+        open={Boolean(assignTarget)}
+        title="Assign Admin User"
+        description={assignTarget ? `Assign ${assignTarget.full_name} (${assignTarget.username}) to an admin user.` : ''}
         onClose={() => {
-          setLoginTarget(null)
-          setLoginMessage('')
+          setAssignTarget(null)
+          setAssignMessage('')
         }}
-        onConfirm={handleCreateLogin}
-        confirmText={savingLogin ? 'Creating...' : 'Create Login'}
+        onConfirm={handleAssignOwner}
+        confirmText={assigningOwner ? 'Saving...' : 'Save Assignment'}
       >
         <div className="space-y-3">
-          <Input
-            label="Admin Full Name"
-            value={loginForm.admin_full_name}
-            onChange={(event) => setLoginForm((prev) => ({ ...prev, admin_full_name: event.target.value }))}
-          />
-          <Input
-            label="Admin Email"
-            type="email"
-            value={loginForm.admin_email}
-            onChange={(event) => setLoginForm((prev) => ({ ...prev, admin_email: event.target.value }))}
-          />
-          <Input
-            label="Temporary Password"
-            type="password"
-            value={loginForm.admin_password}
-            onChange={(event) => setLoginForm((prev) => ({ ...prev, admin_password: event.target.value }))}
-          />
-          {loginMessage ? <p className="text-sm text-blue-700">{loginMessage}</p> : null}
+          <label className="flex w-full flex-col gap-1.5">
+            <span className="text-sm font-medium text-slate-700">Admin User</span>
+            <select
+              value={selectedOwnerId}
+              onChange={(event) => setSelectedOwnerId(event.target.value)}
+              className="h-11 rounded-xl border border-slate-200 bg-white/95 px-3 text-sm outline-none ring-blue-200 transition focus:border-blue-500 focus:ring-2"
+            >
+              <option value="">Unassigned</option>
+              {adminUsers.map((admin) => (
+                <option key={admin.id || admin._id} value={admin.id || admin._id}>
+                  {admin.full_name} ({admin.email})
+                </option>
+              ))}
+            </select>
+          </label>
+          {assignMessage ? <p className="text-sm text-blue-700">{assignMessage}</p> : null}
         </div>
       </Modal>
     </div>

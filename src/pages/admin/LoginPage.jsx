@@ -46,7 +46,7 @@ function LoginPage() {
       if (data?.admin) {
         setAuthUser(data.admin)
       }
-      const target = data?.admin?.role === 'ADMIN' ? '/admin/my-account' : from
+      const target = data?.admin?.role === 'ADMIN' ? '/admin/profiles' : from
       navigate(target, { replace: true })
     } catch (error) {
       setApiError(error.response?.data?.message || 'Invalid credentials. Please try again.')

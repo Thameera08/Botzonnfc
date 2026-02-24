@@ -15,7 +15,7 @@ function AdminLayout() {
     { label: 'Dashboard', to: '/admin/dashboard', icon: LayoutDashboard, show: authUser?.role === 'SUPER_ADMIN' },
     { label: 'My Profile', to: '/admin/my-account', icon: UserCircle2, show: true },
     { label: 'Admin Users', to: '/admin/users', icon: Shield, show: authUser?.role === 'SUPER_ADMIN' },
-    { label: 'Profiles', to: '/admin/profiles', icon: UserCircle2, show: authUser?.role === 'SUPER_ADMIN' },
+    { label: 'Profiles', to: '/admin/profiles', icon: UserCircle2, show: true },
   ].filter((item) => item.show)
 
   useEffect(() => {
@@ -48,7 +48,7 @@ function AdminLayout() {
       <div className="mx-auto flex max-w-7xl flex-col gap-4 px-3 py-4 md:flex-row md:px-6">
         <aside className="modern-panel w-full rounded-2xl p-3 md:sticky md:top-4 md:h-fit md:w-64">
           <Link
-            to="/admin/dashboard"
+            to="/admin/profiles"
             className="mb-4 flex items-center justify-center rounded-xl bg-white px-3 py-3 shadow-[0_10px_20px_rgba(15,111,255,0.14)]"
           >
             <BrandLogo2 imageClassName="h-12 w-auto max-w-none" />

@@ -40,8 +40,8 @@ export const updateProfileStatus = async (id, status) => {
   return normalizeProfile(response.data)
 }
 
-export const createProfileLogin = async (id, payload) => {
-  const response = await api.post(`/admin/profiles/${id}/create-login`, payload)
+export const assignProfileOwner = async (id, owner_admin_id) => {
+  const response = await api.patch(`/admin/profiles/${id}/owner`, { owner_admin_id })
   return response.data
 }
 

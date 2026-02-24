@@ -10,6 +10,7 @@ import Card from '../../components/ui/Card'
 import Input from '../../components/ui/Input'
 import Toggle from '../../components/ui/Toggle'
 import { createProfile, getProfileById, updateProfile } from '../../services/api/profileApi'
+import { getAdminUsers } from '../../services/api/authApi'
 import { downloadImage } from '../../utils/download'
 import { getAuthUser } from '../../utils/auth'
 
@@ -34,10 +35,7 @@ const profileSchema = z.object({
   nfc_uid: z.string().optional(),
   public_theme: z.enum(['DARK_MINIMAL', 'LIGHT_GLASS', 'CLASSIC_BLUE']),
   status: z.enum(['ACTIVE', 'DISABLED']),
-  admin_full_name: z.string().optional(),
-  admin_email: z.string().email('Enter a valid admin email').or(z.literal('')).optional(),
-  admin_password: z.string().optional(),
-  admin_profile_image_url: z.string().optional(),
+  owner_admin_id: z.string().optional(),
 })
 
 const initialValues = {
@@ -58,10 +56,7 @@ const initialValues = {
   nfc_uid: '',
   public_theme: 'DARK_MINIMAL',
   status: 'ACTIVE',
-  admin_full_name: '',
-  admin_email: '',
-  admin_password: '',
-  admin_profile_image_url: '',
+  owner_admin_id: '',
 }
 
 function ProfileFormPage({ mode }) {
@@ -74,6 +69,7 @@ function ProfileFormPage({ mode }) {
   const [imagePreview, setImagePreview] = useState('')
   const [downloadingCard, setDownloadingCard] = useState('')
   const [cardStyle, setCardStyle] = useState('BOLD_BLUE')
+  const [adminUsers, setAdminUsers] = useState([])
   const cardFrontRef = useRef(null)
   const cardBackRef = useRef(null)
 
@@ -81,8 +77,6 @@ function ProfileFormPage({ mode }) {
     register,
     handleSubmit,
     setValue,
-    setError,
-    clearErrors,
     reset,
     watch,
     formState: { errors, isSubmitting },
@@ -107,6 +101,18 @@ function ProfileFormPage({ mode }) {
     })
 
   useEffect(() => {
+    if (!isSuperAdmin) return
+
+    const loadAdmins = async () => {
+      const response = await getAdminUsers()
+      const items = response?.items || response?.data?.items || []
+      setAdminUsers(items)
+    }
+
+    loadAdmins()
+  }, [isSuperAdmin])
+
+  useEffect(() => {
     if (mode !== 'edit') return
 
     const loadProfile = async () => {
@@ -126,6 +132,7 @@ function ProfileFormPage({ mode }) {
           twitter_url: profile.twitter_url || '',
           whatsapp_url: profile.whatsapp_url || '',
           public_theme: profile.public_theme || 'DARK_MINIMAL',
+          owner_admin_id: profile.owner_admin_id || '',
         })
 
         setQrImage(profile.qr_image_url || '')
@@ -158,30 +165,17 @@ function ProfileFormPage({ mode }) {
   }
 
   const onSubmit = async (values) => {
-    if (mode === 'create' && isSuperAdmin) {
-      clearErrors(['admin_full_name', 'admin_email', 'admin_password'])
-      if (!values.admin_full_name?.trim()) {
-        setError('admin_full_name', { message: 'Admin full name is required' })
-        return
-      }
-      if (!values.admin_email?.trim()) {
-        setError('admin_email', { message: 'Admin email is required' })
-        return
-      }
-      if ((values.admin_password || '').length < 6) {
-        setError('admin_password', { message: 'Temporary password must be at least 6 characters' })
-        return
-      }
+    const payload = { ...values }
+    if (isSuperAdmin) {
+      payload.owner_admin_id = values.owner_admin_id || null
+    } else {
+      delete payload.owner_admin_id
     }
 
     if (mode === 'edit') {
-      await updateProfile(id, values)
+      await updateProfile(id, payload)
     } else {
-      await createProfile({
-        ...values,
-        admin_full_name: values.admin_full_name?.trim(),
-        admin_email: values.admin_email?.trim().toLowerCase(),
-      })
+      await createProfile(payload)
     }
 
     navigate('/admin/profiles')
@@ -276,29 +270,21 @@ function ProfileFormPage({ mode }) {
           </div>
         ) : null}
 
-        {mode === 'create' && isSuperAdmin ? (
+        {isSuperAdmin ? (
           <div className="md:col-span-2 rounded-lg border border-slate-200 bg-slate-50 p-4">
-            <div>
-              <p className="text-sm font-medium text-slate-800">User Admin Login (Required)</p>
-              <p className="text-xs text-slate-500">This login will be created automatically and this user can edit only their own profile.</p>
-            </div>
-
-            <div className="mt-3 grid gap-3 md:grid-cols-2">
-              <Input label="Admin Full Name *" error={errors.admin_full_name?.message} {...register('admin_full_name')} />
-              <Input label="Admin Email *" type="email" error={errors.admin_email?.message} {...register('admin_email')} />
-              <Input
-                label="Temporary Password *"
-                type="password"
-                error={errors.admin_password?.message}
-                placeholder="Minimum 6 characters"
-                {...register('admin_password')}
-              />
-              <Input
-                label="Admin Profile Image URL"
-                error={errors.admin_profile_image_url?.message}
-                {...register('admin_profile_image_url')}
-              />
-            </div>
+            <p className="text-sm font-medium text-slate-800">Assign Admin User</p>
+            <p className="text-xs text-slate-500">Assign this public profile to an existing admin user. One admin can manage multiple profiles.</p>
+            <select
+              {...register('owner_admin_id')}
+              className="mt-3 h-11 w-full rounded-xl border border-slate-200 bg-white/95 px-3 text-sm outline-none ring-blue-200 transition focus:border-blue-500 focus:ring-2"
+            >
+              <option value="">Unassigned</option>
+              {adminUsers.map((admin) => (
+                <option key={admin.id || admin._id} value={admin.id || admin._id}>
+                  {admin.full_name} ({admin.email})
+                </option>
+              ))}
+            </select>
           </div>
         ) : null}
 

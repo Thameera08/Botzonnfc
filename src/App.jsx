@@ -12,12 +12,12 @@ import { getAuthUser } from './utils/auth'
 
 function AdminHomeRedirect() {
   const role = getAuthUser()?.role
-  return <Navigate to={role === 'SUPER_ADMIN' ? '/admin/dashboard' : '/admin/my-account'} replace />
+  return <Navigate to={role === 'SUPER_ADMIN' ? '/admin/dashboard' : '/admin/profiles'} replace />
 }
 
 function SuperAdminOnly({ children }) {
   const role = getAuthUser()?.role
-  if (role !== 'SUPER_ADMIN') return <Navigate to="/admin/my-account" replace />
+  if (role !== 'SUPER_ADMIN') return <Navigate to="/admin/profiles" replace />
   return children
 }
 
@@ -51,14 +51,7 @@ function App() {
             </SuperAdminOnly>
           }
         />
-        <Route
-          path="profiles"
-          element={
-            <SuperAdminOnly>
-              <ProfilesPage />
-            </SuperAdminOnly>
-          }
-        />
+        <Route path="profiles" element={<ProfilesPage />} />
         <Route
           path="profiles/new"
           element={

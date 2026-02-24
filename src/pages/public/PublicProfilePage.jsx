@@ -110,9 +110,39 @@ function PublicProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#090d17] px-4 py-10 text-slate-200">
+      <div className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(37,99,235,0.25),transparent_40%),#090d17] px-4 py-8 text-slate-200">
         <div className="mx-auto w-full max-w-md">
-          <Card className="border-slate-700/50 bg-[#10182a] p-6 text-center text-slate-300">Loading profile...</Card>
+          <div className="overflow-hidden rounded-[28px] border border-white/10 bg-[#0d1424] shadow-[0_24px_70px_rgba(0,0,0,0.45)]">
+            <div className="relative h-72 animate-pulse bg-gradient-to-br from-slate-700/40 via-slate-600/20 to-slate-800/40">
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0d1424] to-transparent" />
+              <div className="absolute bottom-5 left-5 right-5 space-y-2">
+                <div className="h-8 w-52 rounded bg-white/20" />
+                <div className="h-4 w-36 rounded bg-white/15" />
+                <div className="h-3 w-28 rounded bg-white/10" />
+              </div>
+            </div>
+            <div className="space-y-3 p-4">
+              <div className="grid grid-cols-5 gap-2">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div key={`social-${i}`} className="h-10 animate-pulse rounded-xl bg-slate-700/30" />
+                ))}
+              </div>
+              <div className="rounded-2xl border border-slate-700/60 bg-[#121b2f] p-4">
+                <div className="h-3 w-16 animate-pulse rounded bg-slate-600/50" />
+                <div className="mt-3 h-3 w-full animate-pulse rounded bg-slate-600/40" />
+                <div className="mt-2 h-3 w-10/12 animate-pulse rounded bg-slate-600/30" />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={`action-${i}`} className="h-10 animate-pulse rounded-xl bg-slate-700/30" />
+                ))}
+              </div>
+              <div className="flex items-center justify-center gap-2 py-1 text-xs text-slate-400">
+                <span className="h-3 w-3 animate-spin rounded-full border-2 border-slate-500 border-t-cyan-400" />
+                Loading profile...
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     )

@@ -1,6 +1,6 @@
-import connectMeLogo from '../../assets/Logo Horz-03.png'
+import connectMeLogo from '../../assets/Logo png-01.png'
 
-function BrandLogo({ className = '', compact = false, dark = false, imageClassName = '' }) {
+function BrandLogo2({ className = '', compact = false, dark = false, imageClassName = '' }) {
   return (
     <div className={`inline-flex items-center ${className}`}>
       <img
@@ -13,4 +13,4 @@ function BrandLogo({ className = '', compact = false, dark = false, imageClassNa
   )
 }
 
-export default BrandLogo
+export default BrandLogo2

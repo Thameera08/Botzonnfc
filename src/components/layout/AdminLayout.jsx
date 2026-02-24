@@ -1,7 +1,7 @@
 import { LayoutDashboard, LogOut, Shield, UserCircle2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
-import BrandLogo from '../common/BrandLogo'
+import BrandLogo2 from '../common/BrandLogo2'
 import { clearToken } from '../../utils/auth'
 import { subscribeRequestState } from '../../utils/requestLoader'
 
@@ -31,11 +31,11 @@ function AdminLayout() {
         <aside className="modern-panel w-full rounded-2xl p-3 md:sticky md:top-4 md:h-fit md:w-64">
           <Link
             to="/admin/dashboard"
-            className="mb-4 block rounded-xl bg-white px-3 py-2 shadow-[0_10px_20px_rgba(15,111,255,0.14)]"
+            className="mb-4 flex items-center justify-center rounded-xl bg-white px-3 py-3 shadow-[0_10px_20px_rgba(15,111,255,0.14)]"
           >
-            <BrandLogo compact />
+            <BrandLogo2 imageClassName="h-40 w-20 max-w-none" />
           </Link>
-          <nav className="space-y-1">
+          <nav className="space-y-1 ">
             {navItems.map((item) => {
               const Icon = item.icon
               return (

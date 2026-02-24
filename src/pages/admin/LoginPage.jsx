@@ -5,7 +5,7 @@ import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { z } from 'zod'
 import Button from '../../components/ui/Button'
 import Card from '../../components/ui/Card'
-import BrandLogo from '../../components/common/BrandLogo'
+import BrandLogo2 from '../../components/common/BrandLogo2'
 import Input from '../../components/ui/Input'
 import { login } from '../../services/api/authApi'
 import { isAuthenticated, setToken } from '../../utils/auth'
@@ -54,22 +54,23 @@ function LoginPage() {
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#041a63]">
-      <div className="pointer-events-none absolute -left-24 top-[-120px] h-[420px] w-[420px] rounded-full bg-[#3f46d8]/35 blur-3xl" />
-      <div className="pointer-events-none absolute -left-32 bottom-[-140px] h-[380px] w-[380px] rounded-full bg-[#2b39c9]/30 blur-3xl" />
-      <div className="pointer-events-none absolute right-[-120px] top-[15%] h-[460px] w-[460px] rounded-full border-[58px] border-[#3f46d8]/25" />
+    <div className="relative min-h-screen overflow-hidden bg-slate-100">
+      <div className="pointer-events-none absolute -left-28 top-[-160px] h-[420px] w-[420px] rounded-full bg-[#163f7f]/10 blur-3xl" />
+      <div className="pointer-events-none absolute -right-28 bottom-[-160px] h-[420px] w-[420px] rounded-full bg-[#9eea54]/20 blur-3xl" />
+      <div className="pointer-events-none absolute left-[12%] top-[28%] h-[320px] w-[320px] rounded-full border-[36px] border-[#163f7f]/10" />
 
       <div className="mx-auto grid min-h-screen w-full max-w-7xl items-center gap-8 px-4 py-8 md:grid-cols-2 md:px-8 lg:px-12">
         <section className="relative z-10 hidden md:block">
-          <BrandLogo className="mb-10" />
-          <h1 className="max-w-sm text-5xl font-semibold leading-tight text-white">Login into your account</h1>
-          <p className="mt-4 text-lg text-blue-100/80">Manage profiles, NFC cards, and admin access in one place.</p>
+          <BrandLogo2 className="mb-10" imageClassName="h-60 w-60 max-w-none" />
+          <h1 className="max-w-sm text-5xl font-semibold leading-tight text-slate-900">Login into your account</h1>
+          <p className="mt-4 max-w-md text-lg text-slate-600">Manage profiles, NFC cards, and admin access in one place.</p>
+          <div className="mt-8 h-1.5 w-56 rounded-full bg-gradient-to-r from-[#163f7f] to-[#9eea54]" />
         </section>
 
         <section className="relative z-10">
-          <Card className="mx-auto w-full max-w-lg rounded-3xl border border-white/10 bg-white p-6 shadow-2xl sm:p-8">
+          <Card className="mx-auto w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_24px_70px_rgba(15,23,42,0.16)] sm:p-8">
             <div className="mb-5 md:hidden">
-              <BrandLogo className="mb-4" />
+              <BrandLogo2 className="mb-4" imageClassName="h-16 w-auto max-w-none" />
               <h1 className="text-2xl font-bold text-slate-900">ConnetMe Admin Login</h1>
             </div>
 
@@ -86,7 +87,7 @@ function LoginPage() {
                 <Button
                   type="submit"
                   loading={isSubmitting}
-                  className="h-11 min-w-32 rounded-xl !bg-blue-600 !bg-none !shadow-none hover:!bg-blue-700"
+                  className="h-11 min-w-32 rounded-xl !bg-[#163f7f] !bg-none !shadow-none hover:!bg-[#122f61]"
                 >
                   Login
                 </Button>

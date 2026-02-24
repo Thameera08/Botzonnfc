@@ -34,7 +34,6 @@ const profileSchema = z.object({
   nfc_uid: z.string().optional(),
   public_theme: z.enum(['DARK_MINIMAL', 'LIGHT_GLASS', 'CLASSIC_BLUE']),
   status: z.enum(['ACTIVE', 'DISABLED']),
-  create_admin_account: z.boolean().optional(),
   admin_full_name: z.string().optional(),
   admin_email: z.string().email('Enter a valid admin email').or(z.literal('')).optional(),
   admin_password: z.string().optional(),
@@ -59,7 +58,6 @@ const initialValues = {
   nfc_uid: '',
   public_theme: 'DARK_MINIMAL',
   status: 'ACTIVE',
-  create_admin_account: false,
   admin_full_name: '',
   admin_email: '',
   admin_password: '',
@@ -94,7 +92,6 @@ function ProfileFormPage({ mode }) {
   })
 
   const status = watch('status')
-  const createAdminAccount = watch('create_admin_account')
   const selectedTheme = watch('public_theme')
   const fullName = watch('full_name')
   const designation = watch('designation')
@@ -161,7 +158,7 @@ function ProfileFormPage({ mode }) {
   }
 
   const onSubmit = async (values) => {
-    if (mode === 'create' && values.create_admin_account) {
+    if (mode === 'create' && isSuperAdmin) {
       clearErrors(['admin_full_name', 'admin_email', 'admin_password'])
       if (!values.admin_full_name?.trim()) {
         setError('admin_full_name', { message: 'Admin full name is required' })
@@ -180,7 +177,11 @@ function ProfileFormPage({ mode }) {
     if (mode === 'edit') {
       await updateProfile(id, values)
     } else {
-      await createProfile(values)
+      await createProfile({
+        ...values,
+        admin_full_name: values.admin_full_name?.trim(),
+        admin_email: values.admin_email?.trim().toLowerCase(),
+      })
     }
 
     navigate('/admin/profiles')
@@ -277,32 +278,27 @@ function ProfileFormPage({ mode }) {
 
         {mode === 'create' && isSuperAdmin ? (
           <div className="md:col-span-2 rounded-lg border border-slate-200 bg-slate-50 p-4">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <p className="text-sm font-medium text-slate-800">Create Login Account For This User</p>
-                <p className="text-xs text-slate-500">If enabled, this user can log in and edit only their own account/profile.</p>
-              </div>
-              <Toggle checked={Boolean(createAdminAccount)} onChange={(checked) => setValue('create_admin_account', checked)} />
+            <div>
+              <p className="text-sm font-medium text-slate-800">User Admin Login (Required)</p>
+              <p className="text-xs text-slate-500">This login will be created automatically and this user can edit only their own profile.</p>
             </div>
 
-            {createAdminAccount ? (
-              <div className="mt-3 grid gap-3 md:grid-cols-2">
-                <Input label="Admin Full Name *" error={errors.admin_full_name?.message} {...register('admin_full_name')} />
-                <Input label="Admin Email *" type="email" error={errors.admin_email?.message} {...register('admin_email')} />
-                <Input
-                  label="Temporary Password *"
-                  type="password"
-                  error={errors.admin_password?.message}
-                  placeholder="Minimum 6 characters"
-                  {...register('admin_password')}
-                />
-                <Input
-                  label="Admin Profile Image URL"
-                  error={errors.admin_profile_image_url?.message}
-                  {...register('admin_profile_image_url')}
-                />
-              </div>
-            ) : null}
+            <div className="mt-3 grid gap-3 md:grid-cols-2">
+              <Input label="Admin Full Name *" error={errors.admin_full_name?.message} {...register('admin_full_name')} />
+              <Input label="Admin Email *" type="email" error={errors.admin_email?.message} {...register('admin_email')} />
+              <Input
+                label="Temporary Password *"
+                type="password"
+                error={errors.admin_password?.message}
+                placeholder="Minimum 6 characters"
+                {...register('admin_password')}
+              />
+              <Input
+                label="Admin Profile Image URL"
+                error={errors.admin_profile_image_url?.message}
+                {...register('admin_profile_image_url')}
+              />
+            </div>
           </div>
         ) : null}
 

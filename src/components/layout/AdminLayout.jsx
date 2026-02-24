@@ -12,10 +12,10 @@ function AdminLayout() {
   const [authUser, setLocalAuthUser] = useState(() => getAuthUser())
 
   const navItems = [
-    { label: 'Dashboard', to: '/admin/dashboard', icon: LayoutDashboard, show: true },
-    { label: 'My Account', to: '/admin/my-account', icon: UserCircle2, show: true },
+    { label: 'Dashboard', to: '/admin/dashboard', icon: LayoutDashboard, show: authUser?.role === 'SUPER_ADMIN' },
+    { label: 'My Profile', to: '/admin/my-account', icon: UserCircle2, show: true },
     { label: 'Admin Users', to: '/admin/users', icon: Shield, show: authUser?.role === 'SUPER_ADMIN' },
-    { label: 'Profiles', to: '/admin/profiles', icon: UserCircle2, show: true },
+    { label: 'Profiles', to: '/admin/profiles', icon: UserCircle2, show: authUser?.role === 'SUPER_ADMIN' },
   ].filter((item) => item.show)
 
   useEffect(() => {

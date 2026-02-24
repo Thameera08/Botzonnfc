@@ -48,6 +48,7 @@ function MyAccountPage() {
   const [linkedProfileMessage, setLinkedProfileMessage] = useState('')
   const [statusMessage, setStatusMessage] = useState('')
   const [passwordMessage, setPasswordMessage] = useState('')
+  const [publicUsername, setPublicUsername] = useState('')
 
   const accountForm = useForm({
     resolver: zodResolver(accountSchema),
@@ -118,8 +119,10 @@ function MyAccountPage() {
             nfc_uid: linkedProfile.nfc_uid || '',
             public_theme: linkedProfile.public_theme || 'DARK_MINIMAL',
           })
+          setPublicUsername(linkedProfile.username || '')
           setLinkedProfileMessage('')
         } catch (error) {
+          setPublicUsername('')
           setLinkedProfileMessage(error.response?.data?.message || 'No linked business profile found.')
         }
       } finally {
@@ -231,6 +234,16 @@ function MyAccountPage() {
       <Card className="p-5">
         <h3 className="text-base font-semibold text-slate-900">My Business Profile</h3>
         <p className="mt-1 text-sm text-slate-600">These details are visible on your public profile page.</p>
+        {publicUsername ? (
+          <a
+            href={`/${publicUsername}`}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-3 inline-flex rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700 hover:bg-blue-100"
+          >
+            View Public Profile
+          </a>
+        ) : null}
 
         {linkedProfileMessage && linkedProfileMessage.includes('No linked') ? (
           <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-700">{linkedProfileMessage}</p>

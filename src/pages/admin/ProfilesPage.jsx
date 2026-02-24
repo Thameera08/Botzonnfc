@@ -7,7 +7,7 @@ import Input from '../../components/ui/Input'
 import Modal from '../../components/ui/Modal'
 import Table from '../../components/ui/Table'
 import Toggle from '../../components/ui/Toggle'
-import { getProfiles, updateProfileStatus } from '../../services/api/profileApi'
+import { createProfileLogin, getProfiles, updateProfileStatus } from '../../services/api/profileApi'
 import { downloadImage } from '../../utils/download'
 import { getAuthUser } from '../../utils/auth'
 
@@ -22,6 +22,10 @@ function ProfilesPage() {
   const [status, setStatus] = useState('')
   const [page, setPage] = useState(1)
   const [confirmData, setConfirmData] = useState(null)
+  const [loginTarget, setLoginTarget] = useState(null)
+  const [loginForm, setLoginForm] = useState({ admin_full_name: '', admin_email: '', admin_password: '' })
+  const [savingLogin, setSavingLogin] = useState(false)
+  const [loginMessage, setLoginMessage] = useState('')
 
   const fetchProfiles = async () => {
     setLoading(true)
@@ -115,6 +119,23 @@ function ProfilesPage() {
                   })
                 }
               />
+              {authUser?.role === 'SUPER_ADMIN' && !row.owner_admin_id ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLoginMessage('')
+                    setLoginTarget(row)
+                    setLoginForm({
+                      admin_full_name: row.full_name || '',
+                      admin_email: row.email || '',
+                      admin_password: '',
+                    })
+                  }}
+                  className="inline-flex h-8 items-center gap-1 rounded-lg border border-slate-200 px-2 text-xs font-medium text-slate-700 transition hover:bg-slate-100"
+                >
+                  Create Login
+                </button>
+              ) : null}
             </div>
           )
         },
@@ -135,6 +156,34 @@ function ProfilesPage() {
     await updateProfileStatus(confirmData.id, confirmData.targetStatus)
     setConfirmData(null)
     await fetchProfiles()
+  }
+
+  const handleCreateLogin = async () => {
+    if (!loginTarget) return
+    if (!loginForm.admin_full_name.trim() || !loginForm.admin_email.trim() || loginForm.admin_password.length < 6) {
+      setLoginMessage('Name, email and password (min 6 chars) are required.')
+      return
+    }
+
+    setSavingLogin(true)
+    setLoginMessage('')
+    try {
+      await createProfileLogin(loginTarget.id, {
+        admin_full_name: loginForm.admin_full_name.trim(),
+        admin_email: loginForm.admin_email.trim().toLowerCase(),
+        admin_password: loginForm.admin_password,
+      })
+      setLoginMessage('Login created successfully.')
+      await fetchProfiles()
+      setTimeout(() => {
+        setLoginTarget(null)
+        setLoginMessage('')
+      }, 900)
+    } catch (error) {
+      setLoginMessage(error.response?.data?.message || 'Unable to create login')
+    } finally {
+      setSavingLogin(false)
+    }
   }
 
   return (
@@ -205,6 +254,39 @@ function ProfilesPage() {
         onConfirm={handleConfirmStatus}
         confirmText="Confirm"
       />
+
+      <Modal
+        open={Boolean(loginTarget)}
+        title="Create Admin Login"
+        description={loginTarget ? `Create login for ${loginTarget.full_name} (${loginTarget.username})` : ''}
+        onClose={() => {
+          setLoginTarget(null)
+          setLoginMessage('')
+        }}
+        onConfirm={handleCreateLogin}
+        confirmText={savingLogin ? 'Creating...' : 'Create Login'}
+      >
+        <div className="space-y-3">
+          <Input
+            label="Admin Full Name"
+            value={loginForm.admin_full_name}
+            onChange={(event) => setLoginForm((prev) => ({ ...prev, admin_full_name: event.target.value }))}
+          />
+          <Input
+            label="Admin Email"
+            type="email"
+            value={loginForm.admin_email}
+            onChange={(event) => setLoginForm((prev) => ({ ...prev, admin_email: event.target.value }))}
+          />
+          <Input
+            label="Temporary Password"
+            type="password"
+            value={loginForm.admin_password}
+            onChange={(event) => setLoginForm((prev) => ({ ...prev, admin_password: event.target.value }))}
+          />
+          {loginMessage ? <p className="text-sm text-blue-700">{loginMessage}</p> : null}
+        </div>
+      </Modal>
     </div>
   )
 }

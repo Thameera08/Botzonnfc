@@ -8,6 +8,18 @@ import MyAccountPage from './pages/admin/MyAccountPage'
 import ProfileFormPage from './pages/admin/ProfileFormPage'
 import ProfilesPage from './pages/admin/ProfilesPage'
 import PublicProfilePage from './pages/public/PublicProfilePage'
+import { getAuthUser } from './utils/auth'
+
+function AdminHomeRedirect() {
+  const role = getAuthUser()?.role
+  return <Navigate to={role === 'SUPER_ADMIN' ? '/admin/dashboard' : '/admin/my-account'} replace />
+}
+
+function SuperAdminOnly({ children }) {
+  const role = getAuthUser()?.role
+  if (role !== 'SUPER_ADMIN') return <Navigate to="/admin/my-account" replace />
+  return children
+}
 
 function App() {
   return (
@@ -21,12 +33,40 @@ function App() {
           </PrivateRoute>
         }
       >
-        <Route index element={<Navigate to="/admin/dashboard" replace />} />
-        <Route path="dashboard" element={<DashboardPage />} />
+        <Route index element={<AdminHomeRedirect />} />
+        <Route
+          path="dashboard"
+          element={
+            <SuperAdminOnly>
+              <DashboardPage />
+            </SuperAdminOnly>
+          }
+        />
         <Route path="my-account" element={<MyAccountPage />} />
-        <Route path="users" element={<AdminUsersPage />} />
-        <Route path="profiles" element={<ProfilesPage />} />
-        <Route path="profiles/new" element={<ProfileFormPage mode="create" />} />
+        <Route
+          path="users"
+          element={
+            <SuperAdminOnly>
+              <AdminUsersPage />
+            </SuperAdminOnly>
+          }
+        />
+        <Route
+          path="profiles"
+          element={
+            <SuperAdminOnly>
+              <ProfilesPage />
+            </SuperAdminOnly>
+          }
+        />
+        <Route
+          path="profiles/new"
+          element={
+            <SuperAdminOnly>
+              <ProfileFormPage mode="create" />
+            </SuperAdminOnly>
+          }
+        />
         <Route path="profiles/:id/edit" element={<ProfileFormPage mode="edit" />} />
       </Route>
 

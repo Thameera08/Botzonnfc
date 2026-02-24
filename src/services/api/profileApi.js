@@ -40,6 +40,11 @@ export const updateProfileStatus = async (id, status) => {
   return normalizeProfile(response.data)
 }
 
+export const createProfileLogin = async (id, payload) => {
+  const response = await api.post(`/admin/profiles/${id}/create-login`, payload)
+  return response.data
+}
+
 export const getPublicProfile = async (username) => {
   const response = await api.get(`/profile/${username}`)
   return normalizeProfile(response.data)

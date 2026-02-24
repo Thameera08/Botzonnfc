@@ -148,7 +148,7 @@ function ProfilesPage() {
                   })
                 }
               />
-              {authUser?.role === 'SUPER_ADMIN' ? (
+              {/* {authUser?.role === 'SUPER_ADMIN' ? (
                 <button
                   type="button"
                   onClick={() => {
@@ -160,7 +160,7 @@ function ProfilesPage() {
                 >
                   Assign Admin
                 </button>
-              ) : null}
+              ) : null} */}
             </div>
           )
         },
